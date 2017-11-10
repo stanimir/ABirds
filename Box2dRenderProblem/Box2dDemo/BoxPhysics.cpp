@@ -95,13 +95,16 @@ void BoxPhysics::createAnotherMiddleWall()
 {
 	b2BodyDef amiddleWallDef;
 	amiddleWallDef.type = b2_dynamicBody;
-	amiddleWallDef.position.Set(625 * P2M, 400 * P2M);
+	amiddleWallDef.position.Set(635 * P2M, 200 * P2M);
 	anotherMiddleWall = world->CreateBody(&amiddleWallDef);
 
 	b2PolygonShape staticBody;
 	staticBody.SetAsBox(P2M * 25, P2M * 190);
 	b2FixtureDef sfixtureDef;
 	sfixtureDef.shape = &staticBody;
+	sfixtureDef.density = 1.0f;
+	sfixtureDef.friction = 0.3f;
+	sfixtureDef.restitution = 0.0f;
 	anotherMiddleWall->CreateFixture(&sfixtureDef);
 }
 
@@ -109,7 +112,7 @@ void BoxPhysics::createBody()
 {
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
-	bodyDef.position.Set(625 * P2M, 200 * P2M);
+	bodyDef.position.Set(700 * P2M, 500 * P2M);
 	bird = world->CreateBody(&bodyDef);
 
 	b2PolygonShape dynamicBox;

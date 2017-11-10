@@ -85,7 +85,7 @@ void Game::GameLoop()
 				physics->world->DestroyJoint(physics->mouseJoint);
 				physics->mouseJoint = NULL;
 			}*/
-			//physics->bird->ApplyLinearImpulse(b2Vec2(-0.5f, 0), physics->bird->GetWorldCenter(), true);
+			physics->bird->ApplyLinearImpulse(b2Vec2(-0.5f, 0), physics->bird->GetWorldCenter(), true);
 
 			break;
 
