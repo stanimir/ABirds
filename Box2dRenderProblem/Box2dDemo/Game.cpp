@@ -15,7 +15,7 @@ Game::Game(int passed_ScreenWidth, int passed_ScreenHeight)
 	background = new Sprite(csdl_setup->GetRenderer(), "background.png", 0, 0, ScreenWidth, ScreenHeight);
 	ground = new Sprite(csdl_setup->GetRenderer(), "ground.png", 0, 700, 1600, 1);
 	middleWall = new Sprite(csdl_setup->GetRenderer(), "ground.png", 700, 700, 25, 25);
-	anotherMiddleWall = new Sprite(csdl_setup->GetRenderer(), "ground.png", 700, 610, 25, 190);
+	anotherMiddleWall = new Sprite(csdl_setup->GetRenderer(), "ground.png", 700, 610, 40, 190);
 	box = new Sprite(csdl_setup->GetRenderer(), "bird.png", 300, 300, 25, 25);
 	physics = new BoxPhysics();
 	//physics->createMouseJoint();
@@ -36,7 +36,7 @@ void Game::GameLoop()
 	int x = 0;
 	while (!quit &&csdl_setup->GetMainEvent()->type != SDL_QUIT)
 	{
-		
+
 		int mouse_x, mouse_y;
 		int buttons = SDL_GetMouseState(&mouse_x, &mouse_y);
 
@@ -53,18 +53,18 @@ void Game::GameLoop()
 
 			physics->bird->ApplyLinearImpulse(b2Vec2(0.5f, 0), physics->bird->GetWorldCenter(), true);
 
-			float birdAngle = 0 + (physics->bird->GetAngle() * RADTODEG);
-			std::cout << "birdAngle: " << birdAngle << std::endl;
+			//float birdAngle = 0 + (physics->bird->GetAngle() * RADTODEG);
+			//std::cout << "birdAngle: " << birdAngle << std::endl;
 
-			float middletemp = 0 + (physics->middleWall->GetAngle() * RADTODEG);
-			std::cout << "middletemp: " << middletemp << std::endl;
+			//float middletemp = 0 + (physics->middleWall->GetAngle() * RADTODEG);
+			//std::cout << "middletemp: " << middletemp << std::endl;
 
-			float aMiddleWallAngle = 0 + (physics->anotherMiddleWall->GetAngle() * RADTODEG);
-			std::cout << "aMiddleWallAngle: " << aMiddleWallAngle << std::endl;
-			
+			//float aMiddleWallAngle = 0 + (physics->anotherMiddleWall->GetAngle() * RADTODEG);
+			//std::cout << "aMiddleWallAngle: " << aMiddleWallAngle << std::endl;
+			//
 			//float birdCurrentAngle = 360 - (physics->bird->GetAngle() * RADTODEG);
 			//std::cout << "Angle: " <<birdCurrentAngle<< std::endl;
-			
+
 			/*b2Vec2 mousepos = b2Vec2(float((x / 100) - birdtemp.x), float((y / 100) - birdtemp.y));
 			physics->mouseJoint->SetTarget(mousepos);*/
 
@@ -72,18 +72,18 @@ void Game::GameLoop()
 
 			/*if (physics->mouseJoint == NULL)
 			{
-				physics->createMouseJoint(b2Vec2(x, y));
+			physics->createMouseJoint(b2Vec2(x, y));
 			}*/
 
 			break;
 		}
 		case SDL_MOUSEBUTTONUP:
-			
+
 			/*std::cout << "Button up" <<x++ <<std::endl;
 			if (physics->mouseJoint != NULL)
 			{
-				physics->world->DestroyJoint(physics->mouseJoint);
-				physics->mouseJoint = NULL;
+			physics->world->DestroyJoint(physics->mouseJoint);
+			physics->mouseJoint = NULL;
 			}*/
 			physics->bird->ApplyLinearImpulse(b2Vec2(-0.5f, 0), physics->bird->GetWorldCenter(), true);
 
@@ -124,13 +124,14 @@ void Game::GameLoop()
 
 		background->Draw();
 		ground->Draw();
-		
+
 		b2Vec2 walltemp = physics->middleWall->GetPosition();
 		float wallTempAngle = 0 + (physics->middleWall->GetAngle() * RADTODEG);
 		middleWall->Draw(walltemp, wallTempAngle);
 
 		b2Vec2 awalltemp = physics->anotherMiddleWall->GetPosition();
 		awalltemp.y -= 165 * P2M;
+		awalltemp.x -= 15 * P2M;
 		float anotherMiddleWallAngle = 0 + (physics->anotherMiddleWall->GetAngle() * RADTODEG);
 		anotherMiddleWall->Draw(awalltemp, anotherMiddleWallAngle);
 

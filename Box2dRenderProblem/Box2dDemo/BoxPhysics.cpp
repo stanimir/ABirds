@@ -45,7 +45,7 @@ void BoxPhysics::createLeftWall()
 	leftWall = world->CreateBody(&leftWallDef);
 
 	b2EdgeShape leftEdge;
-	leftEdge.Set(b2Vec2(0* P2M, 0 * P2M), b2Vec2(0 * P2M, 900 * P2M));
+	leftEdge.Set(b2Vec2(0 * P2M, 0 * P2M), b2Vec2(0 * P2M, 700 * P2M));
 
 	leftWall->CreateFixture(&leftEdge, 0.0f);
 }
@@ -55,7 +55,7 @@ void BoxPhysics::createRightWall()
 	b2BodyDef rightWallDef;
 	rightWallDef.position.Set(1575 * P2M, 0 * P2M);
 	rightWall = world->CreateBody(&rightWallDef);
-	
+
 	b2EdgeShape rightEdge;
 	rightEdge.Set(b2Vec2(0 * P2M, 0 * P2M), b2Vec2(0 * P2M, 700 * P2M));
 
@@ -95,15 +95,15 @@ void BoxPhysics::createAnotherMiddleWall()
 {
 	b2BodyDef amiddleWallDef;
 	amiddleWallDef.type = b2_dynamicBody;
-	amiddleWallDef.position.Set(635 * P2M, 200 * P2M);
+	amiddleWallDef.position.Set(625 * P2M, 500 * P2M);
 	anotherMiddleWall = world->CreateBody(&amiddleWallDef);
 
 	b2PolygonShape staticBody;
-	staticBody.SetAsBox(P2M * 25, P2M * 190);
+	staticBody.SetAsBox(P2M * 40, P2M * 190);
 	b2FixtureDef sfixtureDef;
 	sfixtureDef.shape = &staticBody;
 	sfixtureDef.density = 1.0f;
-	sfixtureDef.friction = 0.3f;
+	//sfixtureDef.friction = 0.3f;
 	sfixtureDef.restitution = 0.0f;
 	anotherMiddleWall->CreateFixture(&sfixtureDef);
 }
@@ -112,11 +112,11 @@ void BoxPhysics::createBody()
 {
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
-	bodyDef.position.Set(700 * P2M, 500 * P2M);
+	bodyDef.position.Set(625 * P2M, 200 * P2M);
 	bird = world->CreateBody(&bodyDef);
 
 	b2PolygonShape dynamicBox;
-	dynamicBox.SetAsBox(P2M * 25 , P2M * 25 );
+	dynamicBox.SetAsBox(P2M * 25, P2M * 25);
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape = &dynamicBox;
 	fixtureDef.density = 1.0f;
