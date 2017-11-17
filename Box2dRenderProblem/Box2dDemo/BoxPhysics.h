@@ -3,7 +3,7 @@
 
 const float M2P = 100;
 const float P2M = 1 / M2P;
-const float DEGTORAD =  0.0174532925199432957f;
+const float DEGTORAD = 0.0174532925199432957f;
 const float RADTODEG = 57.295779513082320876f;
 
 class BoxPhysics
@@ -23,7 +23,9 @@ public:
 	b2Body* bird;
 	b2Body* groundBody;
 	b2MouseJoint* mouseJoint;
+	b2DistanceJoint* distJoint;
 
+	void nullAllB2Objects();
 	void createBottomFloor();
 	void createLeftWall();
 	void createRightWall();
@@ -32,6 +34,8 @@ public:
 	void createTopWall();
 	void createBody();
 	void createMouseJoint(/*const b2Vec2& p*/);
+	void createDistanceJoint();
+
 
 };
 

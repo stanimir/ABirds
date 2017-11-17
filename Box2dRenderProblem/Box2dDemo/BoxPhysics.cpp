@@ -7,17 +7,19 @@ BoxPhysics::BoxPhysics()
 	b2Vec2 gravity(0.0f, 9.8f);
 	world = new b2World(gravity);
 
-	b2BodyDef bd;
-	groundBody = world->CreateBody(&bd);
+	/*b2BodyDef bd;
+	groundBody = world->CreateBody(&bd);*/
 
+	nullAllB2Objects();
 	createBottomFloor();
 	createLeftWall();
 	createRightWall();
 	createTopWall();
 	createMiddleWall();
-	createAnotherMiddleWall();
+	//createAnotherMiddleWall();
 	createBody();
 	//createMouseJoint();
+	createDistanceJoint();
 }
 
 
@@ -26,9 +28,25 @@ BoxPhysics::~BoxPhysics()
 
 }
 
+void BoxPhysics::nullAllB2Objects()
+{
+	bottomfloor = nullptr;
+	leftWall = nullptr;
+	rightWall = nullptr;
+	middleWall = nullptr;
+	anotherMiddleWall = nullptr;
+	topWall = nullptr;
+	bird = nullptr;
+	groundBody = nullptr;
+	mouseJoint = nullptr;
+	distJoint = nullptr;
+
+}
+
 void BoxPhysics::createBottomFloor()
 {
 	b2BodyDef bottomFloorDef;
+	bottomFloorDef.type = b2_staticBody;
 	bottomFloorDef.position.Set(0 * P2M, 675 * P2M);
 	bottomfloor = world->CreateBody(&bottomFloorDef);
 
@@ -77,13 +95,14 @@ void BoxPhysics::createTopWall()
 void BoxPhysics::createMiddleWall()
 {
 	b2BodyDef middleWallDef;
-	middleWallDef.type = b2_dynamicBody;
-	middleWallDef.position.Set(300 * P2M, 600 * P2M);
+	middleWallDef.type = b2_staticBody;
+	middleWallDef.position.Set(400 * P2M, 400 * P2M);
 	middleWall = world->CreateBody(&middleWallDef);
 
 	b2PolygonShape staticBody;
 	staticBody.SetAsBox(P2M * 25, P2M * 25);
 	b2FixtureDef sfixtureDef;
+	sfixtureDef.filter.maskBits = 0x0000;
 	sfixtureDef.shape = &staticBody;
 	sfixtureDef.density = 1.0f;
 	middleWall->CreateFixture(&sfixtureDef);
@@ -94,8 +113,8 @@ void BoxPhysics::createMiddleWall()
 void BoxPhysics::createAnotherMiddleWall()
 {
 	b2BodyDef amiddleWallDef;
-	amiddleWallDef.type = b2_dynamicBody;
-	amiddleWallDef.position.Set(625 * P2M, 500 * P2M);
+	amiddleWallDef.type = b2_staticBody;
+	amiddleWallDef.position.Set(625 * P2M, 483 * P2M);
 	anotherMiddleWall = world->CreateBody(&amiddleWallDef);
 
 	b2PolygonShape staticBody;
@@ -112,7 +131,7 @@ void BoxPhysics::createBody()
 {
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
-	bodyDef.position.Set(625 * P2M, 200 * P2M);
+	bodyDef.position.Set(400 * P2M, 400 * P2M);
 	bird = world->CreateBody(&bodyDef);
 
 	b2PolygonShape dynamicBox;
@@ -128,11 +147,24 @@ void BoxPhysics::createBody()
 void BoxPhysics::createMouseJoint(/*const b2Vec2& p*/)
 {
 	b2MouseJointDef mouseJointDef;
-	mouseJointDef.bodyA = groundBody;
+	mouseJointDef.bodyA = bottomfloor;
 	mouseJointDef.bodyB = bird;
-	//mouseJointDef.target.Set(p.x, p.y);
 	mouseJointDef.maxForce = 1000.0f * bird->GetMass();
 
 	mouseJoint = (b2MouseJoint*)(world->CreateJoint(&mouseJointDef));
 	bird->SetAwake(true);
 }
+
+void BoxPhysics::createDistanceJoint()
+{
+	b2DistanceJointDef jointDef;
+	b2Vec2 anchor1 = bird->GetWorldCenter();
+	b2Vec2 anchor2 = middleWall->GetWorldCenter();
+	jointDef.Initialize(bird, middleWall, anchor1, anchor2);
+	//jointDef.collideConnected = false;
+	jointDef.length = 0.0f;
+	jointDef.dampingRatio = 0.5f;
+	jointDef.frequencyHz = 1.2f;
+	distJoint = (b2DistanceJoint*)(world->CreateJoint(&jointDef));
+}
+

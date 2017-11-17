@@ -16,7 +16,7 @@ Game::Game(int passed_ScreenWidth, int passed_ScreenHeight)
 	ground = new Sprite(csdl_setup->GetRenderer(), "ground.png", 0, 700, 1600, 1);
 	middleWall = new Sprite(csdl_setup->GetRenderer(), "ground.png", 700, 700, 25, 25);
 	anotherMiddleWall = new Sprite(csdl_setup->GetRenderer(), "ground.png", 700, 610, 40, 190);
-	box = new Sprite(csdl_setup->GetRenderer(), "bird.png", 300, 300, 25, 25);
+	box = new Sprite(csdl_setup->GetRenderer(), "bird.png", 400, 400, 25, 25);
 	physics = new BoxPhysics();
 	//physics->createMouseJoint();
 
@@ -33,61 +33,96 @@ Game::~Game()
 
 void Game::GameLoop()
 {
-	int x = 0;
+
+	bool isButtonDown = false;
 	while (!quit &&csdl_setup->GetMainEvent()->type != SDL_QUIT)
 	{
 
-		int mouse_x, mouse_y;
-		int buttons = SDL_GetMouseState(&mouse_x, &mouse_y);
+
 
 		b2Vec2 birdtemp = b2Vec2(physics->bird->GetPosition());
 		switch (csdl_setup->GetMainEvent()->type)
 		{
-		case SDL_MOUSEBUTTONDOWN:
-		{
 
-			//physics->createMouseJoint();
+			/*case SDL_MOUSEMOTION:
+			{
+			if (csdl_setup->GetMainEvent()->motion.state & SDL_BUTTON_LMASK) {
 			int x = csdl_setup->GetMainEvent()->button.x;
 			int y = csdl_setup->GetMainEvent()->button.y;
+			std::cout << "X: " << x;
+			std::cout << " Y: " << y << std::endl;
+			b2Vec2 temp = b2Vec2(x*P2M, y*P2M);
+			physics->bird->SetTransform(temp, physics->bird->GetAngle());
 
+			break;
+			}
 
-			physics->bird->ApplyLinearImpulse(b2Vec2(0.5f, 0), physics->bird->GetWorldCenter(), true);
+			}
 
-			//float birdAngle = 0 + (physics->bird->GetAngle() * RADTODEG);
-			//std::cout << "birdAngle: " << birdAngle << std::endl;
-
-			//float middletemp = 0 + (physics->middleWall->GetAngle() * RADTODEG);
-			//std::cout << "middletemp: " << middletemp << std::endl;
-
-			//float aMiddleWallAngle = 0 + (physics->anotherMiddleWall->GetAngle() * RADTODEG);
-			//std::cout << "aMiddleWallAngle: " << aMiddleWallAngle << std::endl;
-			//
-			//float birdCurrentAngle = 360 - (physics->bird->GetAngle() * RADTODEG);
-			//std::cout << "Angle: " <<birdCurrentAngle<< std::endl;
-
-			/*b2Vec2 mousepos = b2Vec2(float((x / 100) - birdtemp.x), float((y / 100) - birdtemp.y));
-			physics->mouseJoint->SetTarget(mousepos);*/
-
-
-
-			/*if (physics->mouseJoint == NULL)
+			case SDL_MOUSEBUTTONUP:
 			{
-			physics->createMouseJoint(b2Vec2(x, y));
-			}*/
+			if (physics->distJoint != nullptr) {
+			physics->world->DestroyJoint(physics->distJoint);
+			}
 
+			}*/
+			/////////////////////////////////////////////////
+
+		case SDL_MOUSEBUTTONDOWN:
+		{
+			if (isButtonDown == false) {
+				isButtonDown = true;
+				//std::cout << "ButtonDownisButtonDown: " << isButtonDown << std::endl;
+
+			}
 			break;
 		}
-		case SDL_MOUSEBUTTONUP:
-
-			/*std::cout << "Button up" <<x++ <<std::endl;
-			if (physics->mouseJoint != NULL)
-			{
-			physics->world->DestroyJoint(physics->mouseJoint);
-			physics->mouseJoint = NULL;
-			}*/
-			physics->bird->ApplyLinearImpulse(b2Vec2(-0.5f, 0), physics->bird->GetWorldCenter(), true);
-
+		case SDL_MOUSEMOTION:
+		{
+			if (csdl_setup->GetMainEvent()->motion.state & SDL_BUTTON_LMASK & isButtonDown) {
+				int x = csdl_setup->GetMainEvent()->button.x;
+				int y = csdl_setup->GetMainEvent()->button.y;
+				std::cout << "X: " << x;
+				std::cout << " Y: " << y << std::endl;
+				//std::cout << "MouseMotionisButtonDown: " << isButtonDown << std::endl;
+				//std::cout << "DistanceJoint: " << physics->distJoint->GetReactionForce(-timestep) << std::endl;
+				b2Vec2 temp = b2Vec2(x*P2M, y*P2M);
+				physics->bird->SetTransform(temp, physics->bird->GetAngle());
+			}
 			break;
+		}
+
+		case SDL_MOUSEBUTTONUP:
+		{
+			if (isButtonDown == true) {
+				isButtonDown = false;
+				//std::cout << "ButtonUpisButtonDown: " << isButtonDown << std::endl;
+				if (physics->distJoint != NULL) {
+					physics->world->DestroyJoint(physics->distJoint);
+					physics->distJoint = NULL;
+				}
+			}
+			break;
+		}
+
+
+
+		//case SDL_MOUSEBUTTONUP:
+		//	
+		//	/*std::cout << "Button up" <<x++ <<std::endl;
+		//	if (physics->mouseJoint != NULL)
+		//	{
+		//		physics->world->DestroyJoint(physics->mouseJoint);
+		//		physics->mouseJoint = NULL;
+		//	}*/
+		//	//physics->bird->ApplyLinearImpulse(b2Vec2(-0.5f, 0), physics->bird->GetWorldCenter(), true);
+
+		//	if (physics->mouseJoint) {
+		//		physics->world->DestroyJoint(physics->mouseJoint);
+		//		physics->mouseJoint = NULL;
+		//	}
+
+		//	break;
 
 		default:
 			break;
@@ -118,6 +153,7 @@ void Game::GameLoop()
 		//	physics->bird->ApplyLinearImpulse(b2Vec2(-2, 0), physics->bird->GetWorldCenter(), true);
 		//}
 
+
 		starting_tick = SDL_GetTicks();
 
 		csdl_setup->Begin();
@@ -129,11 +165,14 @@ void Game::GameLoop()
 		float wallTempAngle = 0 + (physics->middleWall->GetAngle() * RADTODEG);
 		middleWall->Draw(walltemp, wallTempAngle);
 
+
+		/*//if (physics->anotherMiddleWall->IsActive()) {
 		b2Vec2 awalltemp = physics->anotherMiddleWall->GetPosition();
 		awalltemp.y -= 165 * P2M;
 		awalltemp.x -= 15 * P2M;
 		float anotherMiddleWallAngle = 0 + (physics->anotherMiddleWall->GetAngle() * RADTODEG);
 		anotherMiddleWall->Draw(awalltemp, anotherMiddleWallAngle);
+		//}*/
 
 		physics->world->Step(timestep, velocityiterations, positioniterations);
 
@@ -154,11 +193,3 @@ void Game::cap_framerate(Uint32 starting_tick)
 		SDL_Delay(1000 / fps - (SDL_GetTicks() - starting_tick));
 	}
 }
-
-//void Game::mousePress(SDL_MouseButtonEvent & b)
-//{
-//	if (b.button == SDL_BUTTON_LEFT)
-//	{
-//
-//	}
-//}
