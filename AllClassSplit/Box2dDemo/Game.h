@@ -20,10 +20,13 @@ private:
 	Uint32 starting_tick;
 	bool quit;
 	bool isButtonDown = false;
-	bool isBirdFlying = true;
+	bool isBirdFlying = false;
 	bool loadNextBird = false;
 	int currentBird = 0;
+	int maxBirds = 3;
 	int pigDead = 4;
+
+	int score = 0;
 
 	void cap_framerate(Uint32 starting_tick);
 	void drawWithPhysics(b2Body* currBody, Sprite* currSprite, float minusX, float minusY);

@@ -20,7 +20,10 @@ Game::Game(int passed_ScreenWidth, int passed_ScreenHeight)
 
 	physics = new BoxPhysics();
 
-	birdObj.push_back(new Birds(*physics->world, csdl_setup, 400, 400));
+	for (int i = 0; i < maxBirds+1; i++)
+	{
+		birdObj.push_back(new Birds(*physics->world, csdl_setup, 400, 400));
+	}
 
 	//physics->createRopeJoint(birdObj[0]->m_birdBody, physics->slingshotBody);
 
@@ -33,23 +36,6 @@ Game::Game(int passed_ScreenWidth, int passed_ScreenHeight)
 	pigWallObj.push_back(new PigWalls(*physics->world, csdl_setup, 950, 520, 100, 10));
 	pigWallObj.push_back(new PigWalls(*physics->world, csdl_setup, 900, 460, 10, 70));
 	pigWallObj.push_back(new PigWalls(*physics->world, csdl_setup, 1000, 460, 10, 70));
-
-
-
-	/*for (int i = 0; i < birdObj.size(); i++)
-	{
-		CreateSprite(birdSprites, "bird.png", 400, 400, 25, 25);
-	}*/
-
-	/*for (int i = 0; i < pigObj.size(); i++)
-	{
-		CreateSprite(redPigSprites, "pig.png", 500, 500, 25, 25);
-	}*/
-
-	/*for (int i = 0; i < pigWallObj.size(); i++)
-	{
-		CreateSprite(pigWallSprites, "ground.png", 500, 500, pigWallObj[i]->w, pigWallObj[i]->h);
-	}*/
 
 }
 
@@ -65,9 +51,9 @@ void Game::GameLoop()
 {
 	while (!quit &&csdl_setup->GetMainEvent()->type != SDL_QUIT)
 	{
-		/*if (physics->ropeJoint == NULL && isBirdFlying == false) {
+		if (physics->ropeJoint == NULL && isBirdFlying == false) {
 			physics->createRopeJoint(birdObj[currentBird]->m_birdBody, physics->slingshotBody);
-		}*/
+		}
 
 		switch (csdl_setup->GetMainEvent()->type)
 		{
@@ -91,8 +77,8 @@ void Game::GameLoop()
 				if (y > 550) y = 550;
 				if (y < 320) y = 320;
 				b2Vec2 temp = b2Vec2(((x - 13)*P2M), ((y - 13)*P2M));
-				birdObj[0]->m_birdBody->SetTransform(temp, birdObj[0]->m_birdBody->GetAngle());
-				birdObj[0]->m_birdBody->SetLinearVelocity(b2Vec2(0, 0));
+				birdObj[currentBird]->m_birdBody->SetTransform(temp, birdObj[currentBird]->m_birdBody->GetAngle());
+				birdObj[currentBird]->m_birdBody->SetLinearVelocity(b2Vec2(0, 0));
 
 				//physics->birdVector[0]->SetTransform(temp, physics->birdVector[0]->GetAngle());
 				//physics->birdVector[0]->SetLinearVelocity(b2Vec2(0, 0));
@@ -109,7 +95,7 @@ void Game::GameLoop()
 
 			if (isButtonDown == true) {
 				isButtonDown = false;
-				b2Vec2 birdLastPos = birdObj[0]->m_birdBody->GetPosition();
+				b2Vec2 birdLastPos = birdObj[currentBird]->m_birdBody->GetPosition();
 				//b2Vec2 birdLastPos = physics->birdVector[0]->GetPosition();
 				b2Vec2 wallPos = physics->slingshotBody->GetPosition();
 
@@ -123,11 +109,11 @@ void Game::GameLoop()
 					physics->ropeJoint = NULL;
 				}
 
-				birdObj[0]->m_birdBody->ApplyLinearImpulse(forceToApply, birdObj[0]->m_birdBody->GetWorldCenter(), true);
+				birdObj[currentBird]->m_birdBody->ApplyLinearImpulse(forceToApply, birdObj[currentBird]->m_birdBody->GetWorldCenter(), true);
 
 				//physics->birdVector[0]->ApplyLinearImpulse(forceToApply, physics->birdVector[0]->GetWorldCenter(), true);
+				isBirdFlying = true;
 			}
-			//isBirdFlying = false;
 			break;
 		}
 
@@ -153,14 +139,15 @@ void Game::drawLevel()
 	background->Draw();
 	ground->Draw();
 
-	b2Vec2 birdTemp = birdObj[0]->m_birdBody->GetPosition();
+	//b2Vec2 birdTemp = birdObj[0]->m_birdBody->GetPosition();
 
 	drawWithPhysics(physics->slingshotBody, slingshotBox, 0, 0);
 
 	for (int i = 0; i < pigObj.size(); i++)
 	{
-		if (*(int*)pigObj[i]->m_pigBody->GetUserData() == 4) {
+		if (pigObj[i]->m_pigBody->IsActive() && (*(int*)pigObj[i]->m_pigBody->GetUserData() == 4)) {
 			pigObj[i]->m_pigBody->SetActive(false);
+			score += 50;
 		}
 		if (pigObj[i]->m_pigBody->IsActive()) {
 			drawWithPhysics(pigObj[i]->m_pigBody, pigObj[i]->m_pigSprite, 0, 0);
@@ -168,7 +155,7 @@ void Game::drawLevel()
 	}
 
 	for (int i = 0; i < pigWallObj.size(); i++) {
-		drawWithPhysics(pigWallObj[i]->m_pigWallBody, pigWallObj[i]->m_pigWallSprite, (25- pigWallObj[i]->m_w), (25- pigWallObj[i]->m_h));
+		drawWithPhysics(pigWallObj[i]->m_pigWallBody, pigWallObj[i]->m_pigWallSprite, (25 - pigWallObj[i]->m_w), (25 - pigWallObj[i]->m_h));
 	}
 
 	for (int i = 0; i < birdObj.size(); i++)
@@ -183,11 +170,19 @@ void Game::drawLevel()
 
 	physics->world->Step(timestep, velocityiterations, positioniterations);
 
-	b2Vec2 afterBirdTemp = birdObj[0]->m_birdBody->GetPosition();
+	//b2Vec2 afterBirdTemp = birdObj[0]->m_birdBody->GetPosition();
 
-	/*if (afterBirdTemp == birdTemp && isBirdFlying == false) {
-		physics->birdVector[0]->SetUserData(&pigDead);
-	}*/
+
+	if (!(birdObj[currentBird]->m_birdBody->IsAwake()) && isBirdFlying == true) {
+		birdObj[currentBird]->m_birdBody->SetUserData(&pigDead);
+		if (currentBird < maxBirds) {
+			currentBird++;
+			isBirdFlying = false;
+		}
+		else {
+			std::cout << "Game Over! \nScore: " << score << std::endl;
+		}
+	}
 }
 
 void Game::CreateSprite(std::vector<Sprite*>& temp, std::string filename, int x, int y, int w, int h)
