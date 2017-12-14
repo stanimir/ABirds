@@ -15,7 +15,7 @@ Game::Game(int passed_ScreenWidth, int passed_ScreenHeight)
 	background = new Sprite(csdl_setup->GetRenderer(), "background.png", 0, 0, ScreenWidth, ScreenHeight);
 	ground = new Sprite(csdl_setup->GetRenderer(), "ground.png", 0, ScreenHeight - 200, ScreenWidth, 1);
 	slingshotBox = new Sprite(csdl_setup->GetRenderer(), "ground.png", 700, 700, 25, 25);
-	rubberA = new Sprite(csdl_setup->GetRenderer(), "ground.png", 400, 400, 50, 5);
+	//rubberA = new Sprite(csdl_setup->GetRenderer(), "ground.png", 400, 400, 50, 5);
 
 
 	physics = new BoxPhysics();
@@ -36,6 +36,11 @@ Game::Game(int passed_ScreenWidth, int passed_ScreenHeight)
 	pigWallObj.push_back(new PigWalls(*physics->world, csdl_setup, 950, 520, 100, 10));
 	pigWallObj.push_back(new PigWalls(*physics->world, csdl_setup, 900, 460, 10, 70));
 	pigWallObj.push_back(new PigWalls(*physics->world, csdl_setup, 1000, 460, 10, 70));
+
+	
+	if (Mix_PlayMusic(csdl_setup->bgm, -1) == -1) {
+		std::cout << "Mix_PlayMusic Error: " << Mix_GetError() << std::endl;
+	}
 
 }
 
@@ -62,6 +67,7 @@ void Game::GameLoop()
 		{
 			if (isButtonDown == false) {
 				isButtonDown = true;
+				Mix_PlayChannel(-1, csdl_setup->rubberband, 0);
 			}
 			break;
 		}
@@ -76,7 +82,7 @@ void Game::GameLoop()
 				if (x > 400) x = 400;
 				if (y > 550) y = 550;
 				if (y < 320) y = 320;
-				b2Vec2 temp = b2Vec2(((x - 13)*P2M), ((y - 13)*P2M));
+				b2Vec2 temp = b2Vec2(((x - 25)*P2M), ((y - 25)*P2M));
 				birdObj[currentBird]->m_birdBody->SetTransform(temp, birdObj[currentBird]->m_birdBody->GetAngle());
 				birdObj[currentBird]->m_birdBody->SetLinearVelocity(b2Vec2(0, 0));
 
