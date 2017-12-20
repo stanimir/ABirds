@@ -13,6 +13,7 @@ public:
 	void Draw();
 	void Draw(b2Vec2 newPos);
 	void Draw(b2Vec2 newPos, float angle);
+	void DrawSling(b2Vec2 birdPos, b2Vec2 slingPos, float angle);
 
 private:
 	SDL_Texture* image;

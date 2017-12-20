@@ -40,7 +40,7 @@ private:
 
 	void cap_framerate(Uint32 starting_tick);
 	void drawWithPhysics(b2Body* currBody, Sprite* currSprite, float minusX, float minusY);
-	//void drawSlingshot(b2Body* birdBody, b2Body* slingbody, Sprite* rubberband);
+	void drawSlingshot(b2Body* birdBody, b2Body* slingbody, Sprite* rubberband);
 	void resetLevel();
 	void loadNextLevel();
 	void drawLevel();

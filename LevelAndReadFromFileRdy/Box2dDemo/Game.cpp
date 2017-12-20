@@ -3,7 +3,6 @@
 #include <fstream>
 #include <sstream>
 
-
 const int fps = 60;
 const int velocityiterations = 10;
 const int positioniterations = 8;
@@ -21,9 +20,9 @@ Game::Game(int passed_ScreenWidth, int passed_ScreenHeight)
 
 	gameState = GameState::Level1;
 
-	if (Mix_PlayMusic(csdl_setup->bgm, -1) == -1) {
+	/*if (Mix_PlayMusic(csdl_setup->bgm, -1) == -1) {
 		std::cout << "Mix_PlayMusic Error: " << Mix_GetError() << std::endl;
-	}
+	}*/
 }
 
 
@@ -173,6 +172,9 @@ void Game::drawLevel()
 	background->Draw();
 	ground->Draw();
 
+	if (isBirdFlying == false) {
+		drawSlingshot(birdObj[currentBird]->m_birdBody, physics->slingshotBody, rubberA);
+	}
 
 	drawWithPhysics(physics->slingshotBody, slingshotBox, 0, 0);
 
@@ -287,6 +289,7 @@ void Game::loadNextLevel()
 
 	ground = new Sprite(csdl_setup->GetRenderer(), "ground.png", 0, ScreenHeight - 200, ScreenWidth, 1);
 	slingshotBox = new Sprite(csdl_setup->GetRenderer(), "ground.png", 700, 700, 25, 25);
+	rubberA = new Sprite(csdl_setup->GetRenderer(), "sling.png", 0, 0, 100, 5);
 
 	physics = new BoxPhysics();
 
@@ -438,11 +441,15 @@ void Game::loadFromFile()
 	std::cout << worldbodycount << std::endl;
 }
 
-/*void Game::drawSlingshot(b2Body * birdBody, b2Body * slingbody, Sprite * rubberband)
+void Game::drawSlingshot(b2Body * birdBody, b2Body * slingbody, Sprite * rubberband)
 {
 	b2Vec2 birdPos = birdBody->GetWorldCenter();
+	birdPos.x += 0.25;
+	birdPos.y += 0.25;
 	b2Vec2 slingPos = slingbody->GetWorldCenter();
+	slingPos.x += 0.25;
+	slingPos.y += 0.25;
 	b2Vec2 posToDraw = b2Vec2((birdPos.x + slingPos.x) / 2, (birdPos.y + slingPos.y) / 2);
 	double angle = atan2(birdPos.y - slingPos.y, birdPos.x - slingPos.x) * 180 / M_PI;
-	rubberband->Draw(posToDraw, angle);
-}*/
+	rubberband->DrawSling(birdPos, slingPos, angle);
+}
