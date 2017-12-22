@@ -20,6 +20,45 @@ Sprite::Sprite(SDL_Renderer* passed_renderer, std::string FilePath, int x, int y
 	rect.y = y;
 	rect.w = w;
 	rect.h = h;
+
+	SDL_QueryTexture(image, NULL, NULL, &image_width, &image_height);
+
+	crop.x = 0;
+	crop.y = 0;
+	crop.w = image_width;
+	crop.h = image_height;
+
+	currentframe = 0;
+	Frame_Amount_X = 0;
+	Frame_Amount_Y = 0;
+}
+
+Sprite::Sprite(SDL_Renderer * passed_renderer, std::string FilePath, int x, int y, int w, int h, int framesX, int framesY)
+{
+	renderer = passed_renderer;
+	image = NULL;
+	image = IMG_LoadTexture(renderer, FilePath.c_str());
+
+	if (image == NULL)
+	{
+		std::cout << "Couldn't Load " << FilePath.c_str() << std::endl;
+	}
+
+	rect.x = x;
+	rect.y = y;
+	rect.w = w;
+	rect.h = h;
+
+	SDL_QueryTexture(image, NULL, NULL, &image_width, &image_height);
+
+	crop.x = 0;
+	crop.y = 0;
+	crop.w = image_width;
+	crop.h = image_height;
+
+	currentframe = 0;
+	Frame_Amount_X = framesX;
+	Frame_Amount_Y = framesY;
 }
 
 
@@ -51,6 +90,36 @@ void Sprite::Draw(b2Vec2 newPos, float angle)
 	temp.w = rect.w * 2;
 	temp.h = rect.h * 2;
 	SDL_RenderCopyEx(renderer, image, NULL, &temp, angle, NULL, SDL_FLIP_NONE);
+}
+
+void Sprite::DrawAnimation(b2Vec2 newPos, float angle)
+{
+	SDL_Rect temp;
+	temp.x = newPos.x * M2P;
+	temp.y = newPos.y * M2P;
+	temp.w = rect.w * 2;
+	temp.h = rect.h * 2;
+	SDL_RenderCopyEx(renderer, image, &crop, &temp, angle, NULL, SDL_FLIP_NONE);
+}
+
+void Sprite::PlayAnimation(int BeginFrame, int EndFrame, float Speed)
+{
+
+	if (animationdelay + Speed <SDL_GetTicks())
+	{
+		if (EndFrame <= currentframe) {
+			currentframe = BeginFrame;
+		}
+		else {
+			currentframe++;
+		}
+		crop.x = currentframe * (image_width / Frame_Amount_X);
+		crop.w = image_width / Frame_Amount_X;
+		crop.h = image_height / Frame_Amount_Y;
+
+		animationdelay = SDL_GetTicks();
+	}
+
 }
 
 void Sprite::DrawSling(b2Vec2 birdPos, b2Vec2 slingPos, float angle)

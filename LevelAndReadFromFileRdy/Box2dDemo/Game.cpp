@@ -104,7 +104,7 @@ void Game::GameLoop()
 					forceToApply.y *= 150;
 					std::cout << "Xforce: " << forceToApply.x << " Yforce: " << forceToApply.y << std::endl;
 
-					
+
 
 					birdObj[currentBird]->m_birdBody->ApplyLinearImpulse(forceToApply, birdObj[currentBird]->m_birdBody->GetWorldCenter(), true);
 
@@ -184,7 +184,9 @@ void Game::drawLevel()
 			birdObj[i]->m_birdBody->SetActive(false);
 		}
 		if (birdObj[i]->m_birdBody->IsActive()) {
-			drawWithPhysics(birdObj[i]->m_birdBody, birdObj[i]->m_birdSprite, 0, 0);
+			//drawWithPhysics(birdObj[i]->m_birdBody, birdObj[i]->m_birdSprite, 0, 0);
+			drawWithPhysicsAndAnim(birdObj[i]->m_birdBody, birdObj[i]->m_birdSpriteAnimation, 0, 0);
+			birdObj[i]->m_birdSpriteAnimation->PlayAnimation(0, 1, 500);
 		}
 	}
 
@@ -224,7 +226,7 @@ void Game::drawLevel()
 			hasEverythingStopped = true;
 		}
 
-		
+
 		if (currentBird < maxBirds) {
 
 			if (hasEverythingStopped == true) {
@@ -262,6 +264,15 @@ void Game::drawWithPhysics(b2Body * currBody, Sprite* currSprite, float xCorrect
 	temp.y += yCorrection * P2M;
 	float tempAngle = 0 + (currBody->GetAngle() * RADTODEG);
 	currSprite->Draw(temp, tempAngle);
+}
+
+void Game::drawWithPhysicsAndAnim(b2Body * currBody, Sprite * currSprite, float xCorrection, float yCorrection)
+{
+	b2Vec2 temp = currBody->GetPosition();
+	temp.x += xCorrection * P2M;
+	temp.y += yCorrection * P2M;
+	float tempAngle = 0 + (currBody->GetAngle() * RADTODEG);
+	currSprite->DrawAnimation(temp, tempAngle);
 }
 
 

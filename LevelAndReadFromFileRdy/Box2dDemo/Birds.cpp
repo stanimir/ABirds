@@ -6,6 +6,7 @@ Birds::Birds(b2World& world, CSDL_Setup* csdl_setup, int xpos, int ypos)
 {
 	createBird(world, xpos, ypos);
 	m_birdSprite = new Sprite(csdl_setup->GetRenderer(), "images/newbird.png", xpos, ypos, 25, 25);
+	m_birdSpriteAnimation = new Sprite(csdl_setup->GetRenderer(), "images/red_big.png", xpos, ypos, 25, 25, 2, 1);
 }
 
 

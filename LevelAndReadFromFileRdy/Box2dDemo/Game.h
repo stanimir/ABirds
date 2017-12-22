@@ -39,7 +39,8 @@ private:
 	int score = 0;
 
 	void cap_framerate(Uint32 starting_tick);
-	void drawWithPhysics(b2Body* currBody, Sprite* currSprite, float minusX, float minusY);
+	void drawWithPhysics(b2Body* currBody, Sprite* currSprite, float xCorrection, float yCorrection);
+	void drawWithPhysicsAndAnim(b2Body* currBody, Sprite* currSprite, float xCorrection, float yCorrection);
 	void drawSlingshot(b2Body* birdBody, b2Body* slingbody, Sprite* rubberband);
 	void resetLevel();
 	void loadNextLevel();

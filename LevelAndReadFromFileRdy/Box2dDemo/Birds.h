@@ -14,6 +14,7 @@ public:
 
 	b2Body* m_birdBody;
 	Sprite* m_birdSprite;
+	Sprite* m_birdSpriteAnimation;
 
 private: 
 	void createBird(b2World& world, int xpos, int ypos);
