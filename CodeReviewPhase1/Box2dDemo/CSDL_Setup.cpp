@@ -1,0 +1,74 @@
+#include "CSDL_Setup.h"
+#include <iostream>
+
+
+CSDL_Setup::CSDL_Setup(bool* quit, int ScreenWidth, int ScreenHeight)
+{
+
+	SDL_Init(SDL_INIT_EVERYTHING);
+	if (TTF_Init() < 0) {
+		std::cout << "Error: " << TTF_GetError() << std::endl;
+	}
+
+
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+		std::cout << "Error: " << Mix_GetError() << std::endl;
+	}
+
+	Mix_Volume(-1, 20);
+	Mix_VolumeMusic(20);
+	bgm = Mix_LoadMUS("sfx/theme.ogg");
+	rubberband = Mix_LoadWAV("sfx/slingshotstr.wav");
+	pigcollide = Mix_LoadWAV("sfx/pigcollision.wav");
+	birdflying = Mix_LoadWAV("sfx/birdfly.wav");
+
+	window = NULL;
+	window = SDL_CreateWindow("ABirds", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, ScreenWidth, ScreenHeight, SDL_WINDOW_SHOWN);
+
+	if (window == NULL)
+	{
+		std::cout << "Window couldn't be created" << std::endl;
+		*quit = true;
+	}
+
+	renderer = NULL;
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+	mainEvent = new SDL_Event();
+}
+
+
+CSDL_Setup::~CSDL_Setup(void)
+{
+	Mix_FreeChunk(rubberband);
+	Mix_FreeChunk(pigcollide);
+	Mix_FreeChunk(birdflying);
+	Mix_FreeMusic(bgm);
+
+	Mix_Quit();
+	SDL_DestroyWindow(window);
+	SDL_DestroyRenderer(renderer);
+	delete mainEvent;
+}
+
+SDL_Renderer* CSDL_Setup::GetRenderer()
+{
+	return renderer;
+}
+
+SDL_Event* CSDL_Setup::GetMainEvent()
+{
+	return mainEvent;
+}
+
+void CSDL_Setup::Begin()
+{
+	SDL_PollEvent(mainEvent);
+	SDL_RenderClear(renderer);
+}
+
+void CSDL_Setup::End()
+{
+	SDL_RenderPresent(renderer);
+}
+
