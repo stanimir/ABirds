@@ -3,7 +3,7 @@
 Pigs::Pigs(b2World& world, CSDL_Setup* csdl_setup, int xpos, int ypos)
 {
 	createPig(world, xpos, ypos);
-	m_pigSprite = new Sprite(csdl_setup->GetRenderer(), "pig.png", 500, 500, 25, 25);
+	
 	m_pigIdleAnimation = new Sprite(csdl_setup->GetRenderer(), "images/Piggy.png", xpos, ypos, 25, 25,2,1);
 	m_pigDeathAnimation = new Sprite(csdl_setup->GetRenderer(), "images/pigDeath.png", xpos, ypos, 25, 25, 3, 1);
 }
@@ -11,7 +11,7 @@ Pigs::Pigs(b2World& world, CSDL_Setup* csdl_setup, int xpos, int ypos)
 
 Pigs::~Pigs()
 {
-	delete m_pigSprite;
+	delete m_pigIdleAnimation;
 	delete m_pigDeathAnimation;
 }
 

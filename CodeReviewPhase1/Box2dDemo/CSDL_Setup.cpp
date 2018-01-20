@@ -6,9 +6,6 @@ CSDL_Setup::CSDL_Setup(bool* quit, int ScreenWidth, int ScreenHeight)
 {
 
 	SDL_Init(SDL_INIT_EVERYTHING);
-	if (TTF_Init() < 0) {
-		std::cout << "Error: " << TTF_GetError() << std::endl;
-	}
 
 
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {

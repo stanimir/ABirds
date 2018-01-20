@@ -14,27 +14,35 @@ Game::Game(int passed_ScreenWidth, int passed_ScreenHeight)
 	ScreenHeight = passed_ScreenHeight;
 	quit = false;
 	csdl_setup = new CSDL_Setup(&quit, ScreenWidth, ScreenHeight);
-	piggyShot = new Sprite(csdl_setup->GetRenderer(), "Scores.png", 0, 0, 200, 115);
+	piggyShot = new Sprite(csdl_setup->GetRenderer(), "images/FiveK.png", 0, 0, 200, 115);
 
 	for (int i = 0; i < 10; i++)
 	{
 		scoreVector.push_back(new Sprite(csdl_setup->GetRenderer(), "images/ScoreSeparate/score" + std::to_string(i) + ".png", 0, 0, 40, 60));
 	}
 
-	/*physics = new BoxPhysics();
-	loadFromFile();*/
-
 	gameState = GameState::MainMenu;
 
-	/*if (Mix_PlayMusic(csdl_setup->bgm, -1) == -1) {
+	if (Mix_PlayMusic(csdl_setup->bgm, -1) == -1) {
 		std::cout << "Mix_PlayMusic Error: " << Mix_GetError() << std::endl;
-	}*/
+	}
 }
 
 
 Game::~Game()
 {
+	delete background;
+	delete exitButton;
+	delete playButton;
+	delete ground;
+	delete slingshotA;
+	delete slingshotB;
+	delete rubberA;
+	delete rubberB;
+	delete gameOver;
+	delete piggyShot;
 	delete csdl_setup;
+	delete replayButton;
 }
 
 void Game::GameLoop()
@@ -44,26 +52,21 @@ void Game::GameLoop()
 		if (gameState == MainMenu || isGameOver == true) {
 
 			switch (csdl_setup->GetMainEvent()->type)
-			{
+			{			
 			case SDL_MOUSEBUTTONDOWN:
 			{
 				if (isButtonDown == false) {
 					isButtonDown = true;
-					//Mix_PlayChannel(-1, csdl_setup->rubberband, 0);
 					int x = csdl_setup->GetMainEvent()->button.x;
 					int y = csdl_setup->GetMainEvent()->button.y;
 					std::cout << "X: " << x;
 					std::cout << " Y: " << y << std::endl;
-					if ((x > exitButton->rect.x & x < exitButton->rect.x + exitButton->rect.w) && (y > exitButton->rect.y & y < exitButton->rect.y + exitButton->rect.h)) {
+					if ((x > exitButton->rect.x && x < exitButton->rect.x + exitButton->rect.w) && (y > exitButton->rect.y && y < exitButton->rect.y + exitButton->rect.h)) {
 						gameState = GameState::EndGame;
 					}
-					/*if ((x > 1220 & x < 1380) & (y > 718 & y < 836)) {
-					std::cout << "You`ve clicked on the main Options..." << std::endl;
-					}*/
-					if ((x > playButton->rect.x && x < playButton->rect.x + playButton->rect.w) && (y > playButton->rect.y & y < playButton->rect.y + playButton->rect.h))
+					if ((x > playButton->rect.x && x < playButton->rect.x + playButton->rect.w) && (y > playButton->rect.y && y < playButton->rect.y + playButton->rect.h))
 					{
 						startGame = true;
-
 					}
 				}
 
@@ -104,7 +107,6 @@ void Game::GameLoop()
 
 			switch (csdl_setup->GetMainEvent()->type)
 			{
-
 			case SDL_MOUSEBUTTONDOWN:
 			{
 				if (isButtonDown == false) {
@@ -119,21 +121,6 @@ void Game::GameLoop()
 				if (csdl_setup->GetMainEvent()->motion.state & SDL_BUTTON_LMASK & isButtonDown) {
 					int x = csdl_setup->GetMainEvent()->button.x;
 					int y = csdl_setup->GetMainEvent()->button.y;
-					/*int maxX;
-					int maxY;
-					if (std::abs(((physics->slingshotBody->GetPosition().x *M2P)) - x) < 200) {
-						maxX = x;
-					}
-					if (std::abs(((physics->slingshotBody->GetPosition().y *M2P)) - y) < 200) {
-						maxY = y;
-					}
-
-					//std::cout << "X: " << x;
-					//std::cout << " Y: " << y << std::endl;
-					if (x < maxX) {
-						x = maxX;
-					}*/
-
 					if (x < 350) x = 350;
 					if (x > 500) x = 500;
 					if (y > 650) y = 650;
@@ -141,13 +128,6 @@ void Game::GameLoop()
 					b2Vec2 temp = b2Vec2(((x - 25)*P2M), ((y - 25)*P2M));
 					birdObj[currentBird]->m_birdBody->SetTransform(temp, birdObj[currentBird]->m_birdBody->GetAngle());
 					birdObj[currentBird]->m_birdBody->SetLinearVelocity(b2Vec2(0, 0));
-
-					//physics->birdVector[0]->SetTransform(temp, physics->birdVector[0]->GetAngle());
-					//physics->birdVector[0]->SetLinearVelocity(b2Vec2(0, 0));
-
-					/*if (physics->middleWall != NULL) {
-						physics->middleWall->SetActive(false);
-					}*/
 				}
 				break;
 			}
@@ -163,23 +143,16 @@ void Game::GameLoop()
 						physics->ropeJoint = NULL;
 					}
 					b2Vec2 birdLastPos = birdObj[currentBird]->m_birdBody->GetPosition();
-					//b2Vec2 birdLastPos = physics->birdVector[0]->GetPosition();
 					b2Vec2 wallPos = physics->slingshotBody->GetPosition();
-
-					
-
 					b2Vec2 forceToApply = b2Vec2(((physics->slingshotBody->GetPosition().x - birdLastPos.x) * P2M), ((physics->slingshotBody->GetPosition().y - birdLastPos.y)*P2M));
 					forceToApply.x *= 150;
 					forceToApply.y *= 150;
 					std::cout << "Xforce: " << forceToApply.x << " Yforce: " << forceToApply.y << std::endl;
 
-
-
 					birdObj[currentBird]->m_birdBody->ApplyLinearImpulse(forceToApply, birdObj[currentBird]->m_birdBody->GetWorldCenter(), true);
 
 					Mix_PlayChannel(-1, csdl_setup->birdflying, 0);
 
-					//physics->birdVector[0]->ApplyLinearImpulse(forceToApply, physics->birdVector[0]->GetWorldCenter(), true);
 					isBirdFlying = true;
 					restrictUserInput = true;
 				}
@@ -219,7 +192,6 @@ void Game::GameLoop()
 		case EndGame:
 			std::cout << "End Of State Machine!" << std::endl;
 			quit = true;
-			//delete csdl_setup;
 			break;
 		default:
 			break;
@@ -238,7 +210,6 @@ void Game::drawLevel()
 {
 	background->Draw();
 	ground->Draw();
-	//DrawScore();
 	slingshotB->Draw();
 	if (isBirdFlying == false) {
 		drawSlingshot(birdObj[currentBird]->m_birdBody, physics->slingshotBody, rubberA);
@@ -251,8 +222,7 @@ void Game::drawLevel()
 		if (*(int*)birdObj[i]->m_birdBody->GetUserData() == userDataDead) {
 			birdObj[i]->m_birdBody->SetActive(false);
 		}
-		if (birdObj[i]->m_birdBody->IsActive()) {
-			//drawWithPhysics(birdObj[i]->m_birdBody, birdObj[i]->m_birdSprite, 0, 0);
+		if (birdObj[i]->m_birdBody->IsActive()) {			
 			drawWithPhysicsAndAnim(birdObj[i]->m_birdBody, birdObj[i]->m_birdSpriteAnimation, 0, 0);
 			birdObj[i]->m_birdSpriteAnimation->PlayAnimation(0, 1, 500);
 		}
@@ -287,7 +257,6 @@ void Game::drawLevel()
 
 
 		if (pigObj[i]->m_pigBody->IsActive()) {
-			//drawWithPhysics(pigObj[i]->m_pigBody, pigObj[i]->m_pigSprite, 0, 0);
 			drawWithPhysicsAndAnim(pigObj[i]->m_pigBody, pigObj[i]->m_pigIdleAnimation, 0, 0);
 			pigObj[i]->m_pigIdleAnimation->PlayAnimation(0, 1, 500);
 		}
@@ -333,18 +302,14 @@ void Game::drawLevel()
 				isGameOver = true;
 				restrictUserInput = false;
 
-				//std::cout << "Game Over! \nScore: " << score << std::endl;
-				gameOver = new Sprite(csdl_setup->GetRenderer(), "gameOver.png", 550, 150, 400, 400);
-				replayButton = new Sprite(csdl_setup->GetRenderer(), "replayButton.png", 600, 500, 300, 100);
-				//ttfScore = new Sprite(csdl_setup->GetRenderer(), std::to_string(score), ScreenWidth / 2, ScreenHeight / 2);
+				gameOver = new Sprite(csdl_setup->GetRenderer(), "images/gameOver.png", 550, 150, 400, 400);
+				replayButton = new Sprite(csdl_setup->GetRenderer(), "images/replayButton.png", 600, 500, 300, 100);
+				
 			}
 			gameOver->Draw();
 			replayButton->Draw();
 			DrawScore();
-			//ttfScore->Draw();
-
-			//while (isGameOver=true)
-			//{
+			
 			switch (csdl_setup->GetMainEvent()->type)
 			{
 			case SDL_MOUSEBUTTONUP:
@@ -356,7 +321,7 @@ void Game::drawLevel()
 					int y = csdl_setup->GetMainEvent()->button.y;
 					std::cout << "X: " << x;
 					std::cout << " Y: " << y << std::endl;
-					if ((x > 600 & x < 1100) & (y > 500 & y < 600))
+					if ((x > 600 && x < 1100) && (y > 500 && y < 600))
 					{
 						resetLevel();
 						isGameOver = false;
@@ -364,14 +329,9 @@ void Game::drawLevel()
 				}
 				break;
 			}
-
 			default:
 				break;
-
-
 			}
-			//}
-			//gameState = GameState::MainMenu;
 		}
 	}
 }
@@ -432,9 +392,9 @@ void Game::resetLevel()
 void Game::loadNextLevel()
 {
 
-	background = new Sprite(csdl_setup->GetRenderer(), "level" + std::to_string(currentLvl) + "bgn.png", 0, 0, ScreenWidth, ScreenHeight);
+	background = new Sprite(csdl_setup->GetRenderer(), "images/level" + std::to_string(currentLvl) + "bgn.png", 0, 0, ScreenWidth, ScreenHeight);
 
-	ground = new Sprite(csdl_setup->GetRenderer(), "ground.png", 0, ScreenHeight - 200, ScreenWidth, 1);
+	ground = new Sprite(csdl_setup->GetRenderer(), "images/ground.png", 0, ScreenHeight - 200, ScreenWidth, 1);
 	slingshotA = new Sprite(csdl_setup->GetRenderer(), "images/SlingA.png", 470, 490, 43, 125);
 	slingshotB = new Sprite(csdl_setup->GetRenderer(), "images/SlingB.png", 500, 500, 38, 198);
 	rubberA = new Sprite(csdl_setup->GetRenderer(), "images/sling.png", 0, 0, 100, 5);
@@ -582,7 +542,7 @@ void Game::drawSlingshot(b2Body * birdBody, b2Body * slingbody, Sprite * rubberb
 	b2Vec2 slingPos = slingbody->GetWorldCenter();
 	slingPos.x += 0.25;
 	slingPos.y += 0.25;
-	double angle = atan2(birdPos.y - slingPos.y, birdPos.x - slingPos.x) * 180 / M_PI;
+	double angle = atan2(birdPos.y - slingPos.y, birdPos.x - slingPos.x) * 180.0f / M_PI;
 	rubberband->DrawSling(birdPos, slingPos, angle);
 }
 

@@ -1,7 +1,6 @@
 #pragma once
 #include "SDL.h"
 #include "SDL_image.h"
-//#include "SDL_ttf.h"
 #include "Box2D\Box2D.h"
 #include <iostream>
 
@@ -10,7 +9,6 @@ class Sprite
 public:
 	Sprite(SDL_Renderer* passed_renderer, std::string FilePath, int x, int y, int w, int h);
 	Sprite(SDL_Renderer* passed_renderer, std::string FilePath, int x, int y, int w, int h, int framesX, int framesY);
-	//Sprite(SDL_Renderer* passed_renderer, std::string TextToWrite, int x, int y);
 	~Sprite(void);
 
 	SDL_Rect rect;
@@ -21,7 +19,7 @@ public:
 	void Draw(b2Vec2 newPos, float angle);
 	void DrawAnimation(b2Vec2 newPos, float angle);
 	void PlayAnimation(int BeginFrame, int EndFrame, float Speed);
-	void DrawSling(b2Vec2 birdPos, b2Vec2 slingPos, float angle);
+	void DrawSling(b2Vec2 birdPos, b2Vec2 slingPos, double angle);
 
 private:
 	SDL_Texture* image;

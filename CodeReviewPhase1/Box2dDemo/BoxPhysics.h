@@ -17,11 +17,9 @@ public:
 
 	b2World* world;
 
-	b2Body* bottomfloor;
-	b2Body* leftWall;
-	b2Body* rightWall;
+
 	b2Body* slingshotBody;
-	b2Body* topWall;
+	b2Body *boundries[4];
 	b2RopeJoint* ropeJoint;
 
 	int numOfWalls = 0;
@@ -30,12 +28,8 @@ public:
 	int wallUserData = 6;
 
 
-	void nullAllB2Objects();
-	void createBottomFloor();
-	void createLeftWall();
-	void createRightWall();
 	void createslingshotBody();
-	void createTopWall();
+	void createEdge(b2Body *body, float xpos, float ypos, float x1, float y1, float x2, float y2);
 	void createRopeJoint(b2Body* body1, b2Body* body2);
 };
 

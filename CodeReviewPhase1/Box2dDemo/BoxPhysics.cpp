@@ -9,82 +9,33 @@ BoxPhysics::BoxPhysics()
 
 	world->SetContactListener(&myContactListenerInstance);
 
-	nullAllB2Objects();
-	createBottomFloor();
-	createLeftWall();
-	createRightWall();
-	createTopWall();
+	//Creates bottom, left, right and top edges
+	createEdge(boundries[0], 0, 675, 0, 0, 1600, 0);
+	createEdge(boundries[1], -25, 0, 0, 0, 0, 700);
+	createEdge(boundries[2], 1575, 0, 0, 0, 0, 700);
+	createEdge(boundries[3], 0, 0, 0, 0, 1600, 0);
+	
 	createslingshotBody();
 }
 
 
 BoxPhysics::~BoxPhysics()
 {
-
+	
 }
 
-void BoxPhysics::nullAllB2Objects()
-{
-	bottomfloor = nullptr;
-	leftWall = nullptr;
-	rightWall = nullptr;
-	slingshotBody = nullptr;
-	topWall = nullptr;
-}
+void BoxPhysics::createEdge(b2Body *body, float xpos, float ypos, float x1, float y1, float x2, float y2) {
+	b2BodyDef edgeDef;
+	edgeDef.type = b2_staticBody;
+	edgeDef.position.Set(xpos * P2M, ypos * P2M);
+	body = world->CreateBody(&edgeDef);
+	body->SetUserData(&wallUserData);
 
-void BoxPhysics::createBottomFloor()
-{
-	b2BodyDef bottomFloorDef;
-	bottomFloorDef.type = b2_staticBody;
-	bottomFloorDef.position.Set(0 * P2M, 675 * P2M);
-	bottomfloor = world->CreateBody(&bottomFloorDef);
-	bottomfloor->SetUserData(&wallUserData);
+	b2EdgeShape edgeShape;
+	edgeShape.Set(b2Vec2(x1 * P2M, y1 * P2M), b2Vec2(x2 * P2M, y2 * P2M));
 
-	b2EdgeShape bottomEdge;
-	bottomEdge.Set(b2Vec2(0 * P2M, 0 * P2M), b2Vec2(1600 * P2M, 0 * P2M));
-
-	bottomfloor->CreateFixture(&bottomEdge, 0.0f);
-}
-
-void BoxPhysics::createLeftWall()
-{
-	b2BodyDef leftWallDef;
-	leftWallDef.position.Set(-25 * P2M, 0 * P2M);
-	leftWall = world->CreateBody(&leftWallDef);
-	leftWall->SetUserData(&wallUserData);
-
-
-	b2EdgeShape leftEdge;
-	leftEdge.Set(b2Vec2(0 * P2M, 0 * P2M), b2Vec2(0 * P2M, 700 * P2M));
-
-	leftWall->CreateFixture(&leftEdge, 0.0f);
-}
-
-void BoxPhysics::createRightWall()
-{
-	b2BodyDef rightWallDef;
-	rightWallDef.position.Set(1575 * P2M, 0 * P2M);
-	rightWall = world->CreateBody(&rightWallDef);
-	rightWall->SetUserData(&wallUserData);
-
-
-	b2EdgeShape rightEdge;
-	rightEdge.Set(b2Vec2(0 * P2M, 0 * P2M), b2Vec2(0 * P2M, 700 * P2M));
-
-	rightWall->CreateFixture(&rightEdge, 0 * P2M);
-}
-
-void BoxPhysics::createTopWall()
-{
-	b2BodyDef topCeilingDef;
-	topCeilingDef.position.Set(0 * P2M, 0 * P2M);
-	topWall = world->CreateBody(&topCeilingDef);
-	topWall->SetUserData(&wallUserData);
-
-	b2EdgeShape topEdge;
-	topEdge.Set(b2Vec2(0 * P2M, 0 * P2M), b2Vec2(1600 * P2M, 0 * P2M));
-
-	topWall->CreateFixture(&topEdge, 0.0f);
+	body->CreateFixture(&edgeShape, 0.0f);
+	
 }
 
 void BoxPhysics::createslingshotBody()

@@ -13,6 +13,7 @@ Birds::Birds(b2World& world, CSDL_Setup* csdl_setup, int xpos, int ypos)
 Birds::~Birds()
 {
 	delete m_birdSprite;
+	delete m_birdSpriteAnimation;
 }
 
 void Birds::createBird(b2World & world, int xpos, int ypos)

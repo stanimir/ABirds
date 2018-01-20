@@ -61,23 +61,6 @@ Sprite::Sprite(SDL_Renderer * passed_renderer, std::string FilePath, int x, int 
 	Frame_Amount_Y = framesY;
 }
 
-/*Sprite::Sprite(SDL_Renderer * passed_renderer, std::string TextToWrite, int x, int y)
-{
-	renderer = passed_renderer;
-	TTF_Font *font = TTF_OpenFont("AbirdsFont.ttf", 68);
-	SDL_Color color = { 0, 0, 0, 255 };
-	SDL_Surface *textSurface = TTF_RenderText_Solid(font, TextToWrite.c_str(), color);
-	image = SDL_CreateTextureFromSurface(renderer, textSurface);
-	rect.x = x;
-	rect.y = y;
-
-	SDL_QueryTexture(image, NULL, NULL, &rect.w, &rect.h);
-
-	SDL_FreeSurface(textSurface);
-	textSurface = NULL;
-}*/
-
-
 Sprite::~Sprite(void)
 {
 	SDL_DestroyTexture(image);
@@ -145,24 +128,16 @@ void Sprite::PlayAnimation(int BeginFrame, int EndFrame, float Speed)
 
 }
 
-void Sprite::DrawSling(b2Vec2 birdPos, b2Vec2 slingPos, float angle)
+void Sprite::DrawSling(b2Vec2 birdPos, b2Vec2 slingPos, double angle)
 {
 	double distanceBetween = sqrt(pow((slingPos.x - birdPos.x), 2) + pow((slingPos.y - birdPos.y), 2));
-	float angle2 = angle;
-	//std::cout << "Distance: " << distanceBetween * M2P << std::endl;
+	double angle2 = angle;
 
 	rect.w = (distanceBetween * M2P) / 2;
 
 	SDL_Point rotatePoint;
 	rotatePoint.x = slingPos.x;
 	rotatePoint.y = slingPos.y;
-
-	/*SDL_Rect temp;
-	temp.x = slingPos.x  * M2P;
-	temp.y = (slingPos.y +0.1f) * M2P;
-	temp.w = rect.w * 2;
-	temp.h = rect.h * 2;
-	SDL_RenderCopyEx(renderer, image, NULL, &temp, angle, &rotatePoint, SDL_FLIP_NONE);*/
 
 	SDL_Rect temp1;
 	temp1.x = (slingPos.x)  * M2P;

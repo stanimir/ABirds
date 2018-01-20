@@ -36,6 +36,7 @@ private:
 	bool restrictUserInput = false;
 	bool isScoreStored = false;
 	bool startGame = false;
+	bool isLevelLoaded = false;
 
 	int worldbodycount = 0;
 	int currentLvl = 0;
@@ -75,10 +76,8 @@ private:
 	Sprite* rubberB;
 	Sprite* gameOver;
 	Sprite* piggyShot;
-	Sprite* ttfScore;
 	CSDL_Setup* csdl_setup;
 	Sprite* replayButton;
-
 
 	BoxPhysics* physics;
 
