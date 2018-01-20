@@ -61,7 +61,7 @@ Sprite::Sprite(SDL_Renderer * passed_renderer, std::string FilePath, int x, int 
 	Frame_Amount_Y = framesY;
 }
 
-Sprite::Sprite(SDL_Renderer * passed_renderer, std::string TextToWrite, int x, int y)
+/*Sprite::Sprite(SDL_Renderer * passed_renderer, std::string TextToWrite, int x, int y)
 {
 	renderer = passed_renderer;
 	TTF_Font *font = TTF_OpenFont("AbirdsFont.ttf", 68);
@@ -75,7 +75,7 @@ Sprite::Sprite(SDL_Renderer * passed_renderer, std::string TextToWrite, int x, i
 
 	SDL_FreeSurface(textSurface);
 	textSurface = NULL;
-}
+}*/
 
 
 Sprite::~Sprite(void)
@@ -85,6 +85,13 @@ Sprite::~Sprite(void)
 
 void Sprite::Draw()
 {
+	SDL_RenderCopy(renderer, image, NULL, &rect);
+}
+
+void Sprite::Draw(int x, int y)
+{
+	rect.x = x;
+	rect.y = y;
 	SDL_RenderCopy(renderer, image, NULL, &rect);
 }
 

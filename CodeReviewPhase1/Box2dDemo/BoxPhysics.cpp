@@ -109,9 +109,9 @@ void BoxPhysics::createRopeJoint(b2Body* body1, b2Body* body2)
 	b2RopeJointDef ropeDef;
 	ropeDef.bodyA = body1;
 	ropeDef.bodyB = body2;
-	ropeDef.maxLength = 100 * P2M;
+	ropeDef.maxLength = 0.5f * P2M;
 	ropeDef.collideConnected = true;
 	ropeDef.localAnchorA.Set(0.0f, 0.0f);
-	ropeDef.localAnchorB.Set(0.0f, 0.0f);
+	ropeDef.localAnchorB.Set(-0.2f, 0.0f);
 	ropeJoint = (b2RopeJoint*) (world->CreateJoint(&ropeDef));
 }

@@ -11,6 +11,8 @@ public:
 
 	b2Body* m_pigBody;
 	Sprite* m_pigSprite;
+	Sprite* m_pigIdleAnimation;
+	Sprite* m_pigDeathAnimation;
 
 	int pigUserData = 2;
 

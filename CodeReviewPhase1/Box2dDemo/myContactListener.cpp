@@ -19,7 +19,7 @@ void myContactListener::PostSolve(b2Contact * contact, const b2ContactImpulse * 
 	if (contact->GetFixtureA() != NULL && contact->GetFixtureA()->GetBody()->GetUserData() != NULL && *(int*)contact->GetFixtureA()->GetBody()->GetUserData() == 2) {
 		if (*impulse->normalImpulses > 0.7f) {
 			std::cout << "bird x pig" << std::endl;
-			contact->GetFixtureA()->GetBody()->SetUserData(&pigDead);
+			contact->GetFixtureA()->GetBody()->SetUserData(&pigIsDying);
 		}
 	}
 
@@ -28,7 +28,7 @@ void myContactListener::PostSolve(b2Contact * contact, const b2ContactImpulse * 
 	{
 		if (*impulse->normalImpulses > 0.7f) {
 			std::cout << "pig x bird" << std::endl;
-			contact->GetFixtureB()->GetBody()->SetUserData(&pigDead);
+			contact->GetFixtureB()->GetBody()->SetUserData(&pigIsDying);
 		}
 	}
 

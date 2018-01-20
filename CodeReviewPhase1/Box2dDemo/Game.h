@@ -33,12 +33,19 @@ private:
 	bool isNextLevel = true;
 	bool isMenuImageLoaded = false;
 	bool isGameOver = false;
+	bool restrictUserInput = false;
+	bool isScoreStored = false;
 
 	int worldbodycount = 0;
 	int currentLvl = 0;
 	int currentBird = 0;
-	int maxBirds = 2;
-	int pigDead = 4;
+	int maxBirds = NULL;
+	int maxPigs = NULL;
+	int pigsKilled = 0;
+
+	int userDataDead = 4;
+	int userDataPigDying = 6;
+
 
 	int score = 0;
 
@@ -52,6 +59,8 @@ private:
 	void loadNextLevel();
 	void drawLevel();
 	void loadFromFile();
+	void DrawScore();
+	void getScoreVector();
 	
 
 
@@ -69,6 +78,7 @@ private:
 	CSDL_Setup* csdl_setup;
 	Sprite* replayButton;
 
+
 	BoxPhysics* physics;
 
 	b2Vec2 pigtemp;
@@ -78,5 +88,7 @@ private:
 	std::vector<Pigs*> pigObj;
 	std::vector<Birds*> birdObj;
 	std::vector<PigWalls*> pigWallObj;
+	std::vector<Sprite*> scoreVector;
+	std::vector<int> scoreDigits;
 };
 

@@ -16,6 +16,11 @@ Game::Game(int passed_ScreenWidth, int passed_ScreenHeight)
 	csdl_setup = new CSDL_Setup(&quit, ScreenWidth, ScreenHeight);
 	piggyShot = new Sprite(csdl_setup->GetRenderer(), "Scores.png", 0, 0, 200, 115);
 
+	for (int i = 0; i < 10; i++)
+	{
+		scoreVector.push_back(new Sprite(csdl_setup->GetRenderer(), "images/ScoreSeparate/score" + std::to_string(i) + ".png", 0, 0, 40, 60));
+	}
+
 	/*physics = new BoxPhysics();
 	loadFromFile();*/
 
@@ -36,7 +41,7 @@ void Game::GameLoop()
 {
 	while (!quit &&csdl_setup->GetMainEvent()->type != SDL_QUIT)
 	{
-		if (gameState == MainMenu) {
+		if (gameState == MainMenu || isGameOver == true) {
 
 			switch (csdl_setup->GetMainEvent()->type)
 			{
@@ -78,7 +83,7 @@ void Game::GameLoop()
 			}
 		}
 
-		else if (gameState != MainMenu && gameState != EndGame)
+		else if (gameState != MainMenu && gameState != EndGame && restrictUserInput == false)
 		{
 			if (isNextLevel == true && gameState != EndGame) {
 				loadNextLevel();
@@ -86,9 +91,11 @@ void Game::GameLoop()
 			}
 
 
-			if (physics->ropeJoint == NULL && isBirdFlying == false && gameState != EndGame) {
+			if (physics->ropeJoint == NULL && isBirdFlying == false) {
 				physics->createRopeJoint(birdObj[currentBird]->m_birdBody, physics->slingshotBody);
+				birdObj[currentBird]->m_birdBody->SetTransform(b2Vec2(4.8f, 5.0f), birdObj[currentBird]->m_birdBody->GetAngle());
 			}
+
 
 			switch (csdl_setup->GetMainEvent()->type)
 			{
@@ -99,6 +106,7 @@ void Game::GameLoop()
 					isButtonDown = true;
 					Mix_PlayChannel(-1, csdl_setup->rubberband, 0);
 				}
+
 				break;
 			}
 			case SDL_MOUSEMOTION:
@@ -144,14 +152,16 @@ void Game::GameLoop()
 
 				if (isButtonDown == true) {
 					isButtonDown = false;
-					b2Vec2 birdLastPos = birdObj[currentBird]->m_birdBody->GetPosition();
-					//b2Vec2 birdLastPos = physics->birdVector[0]->GetPosition();
-					b2Vec2 wallPos = physics->slingshotBody->GetPosition();
-
+					
 					if (physics->ropeJoint != NULL) {
 						physics->world->DestroyJoint(physics->ropeJoint);
 						physics->ropeJoint = NULL;
 					}
+					b2Vec2 birdLastPos = birdObj[currentBird]->m_birdBody->GetPosition();
+					//b2Vec2 birdLastPos = physics->birdVector[0]->GetPosition();
+					b2Vec2 wallPos = physics->slingshotBody->GetPosition();
+
+					
 
 					b2Vec2 forceToApply = b2Vec2(((physics->slingshotBody->GetPosition().x - birdLastPos.x) * P2M), ((physics->slingshotBody->GetPosition().y - birdLastPos.y)*P2M));
 					forceToApply.x *= 150;
@@ -166,6 +176,7 @@ void Game::GameLoop()
 
 					//physics->birdVector[0]->ApplyLinearImpulse(forceToApply, physics->birdVector[0]->GetWorldCenter(), true);
 					isBirdFlying = true;
+					restrictUserInput = true;
 				}
 				break;
 			}
@@ -222,7 +233,7 @@ void Game::drawLevel()
 {
 	background->Draw();
 	ground->Draw();
-
+	//DrawScore();
 	slingshotB->Draw();
 	if (isBirdFlying == false) {
 		drawSlingshot(birdObj[currentBird]->m_birdBody, physics->slingshotBody, rubberA);
@@ -232,7 +243,7 @@ void Game::drawLevel()
 
 	for (int i = 0; i < birdObj.size(); i++)
 	{
-		if (*(int*)birdObj[i]->m_birdBody->GetUserData() == pigDead) {
+		if (*(int*)birdObj[i]->m_birdBody->GetUserData() == userDataDead) {
 			birdObj[i]->m_birdBody->SetActive(false);
 		}
 		if (birdObj[i]->m_birdBody->IsActive()) {
@@ -246,24 +257,34 @@ void Game::drawLevel()
 
 	for (int i = 0; i < pigObj.size(); i++)
 	{
-
-		if (pigObj[i]->m_pigBody->IsActive() && (*(int*)pigObj[i]->m_pigBody->GetUserData() == pigDead)) {
+		
+		if (pigObj[i]->m_pigBody->IsActive() && (*(int*)pigObj[i]->m_pigBody->GetUserData() == userDataPigDying)) {
 			pigtemp = b2Vec2((pigObj[i]->m_pigBody->GetPosition().x) - 1.8f, (pigObj[i]->m_pigBody->GetPosition().y) - 1.6f);
 			pigObj[i]->m_pigBody->SetActive(false);
 			std::cout << "Inside PigSetActive(false)" << std::endl;
 			worldbodycount--;
+			pigsKilled++;
+			
 			Mix_PlayChannel(-1, csdl_setup->pigcollide, 0);
 			score += 5000;
-			pigScoreStart_tick = SDL_GetTicks() + 2000;
+			pigScoreStart_tick = SDL_GetTicks() + 750;
 
 		}
-		if (!pigObj[i]->m_pigBody->IsActive() && pigScoreStart_tick > SDL_GetTicks()) {
+		if (!pigObj[i]->m_pigBody->IsActive() && pigScoreStart_tick > SDL_GetTicks() && (*(int*)pigObj[i]->m_pigBody->GetUserData() == userDataPigDying)) {
 			piggyShot->Draw(pigtemp);
+			drawWithPhysicsAndAnim(pigObj[i]->m_pigBody, pigObj[i]->m_pigDeathAnimation, 0, 0);
+			pigObj[i]->m_pigDeathAnimation->PlayAnimation(0, 2, 250);
 		}
+
+		if (!pigObj[i]->m_pigBody->IsActive() && pigScoreStart_tick < SDL_GetTicks() && (*(int*)pigObj[i]->m_pigBody->GetUserData() == userDataPigDying)) {
+			pigObj[i]->m_pigBody->SetUserData(&userDataDead);
+		}
+
 
 		if (pigObj[i]->m_pigBody->IsActive()) {
-			drawWithPhysics(pigObj[i]->m_pigBody, pigObj[i]->m_pigSprite, 0, 0);
-
+			//drawWithPhysics(pigObj[i]->m_pigBody, pigObj[i]->m_pigSprite, 0, 0);
+			drawWithPhysicsAndAnim(pigObj[i]->m_pigBody, pigObj[i]->m_pigIdleAnimation, 0, 0);
+			pigObj[i]->m_pigIdleAnimation->PlayAnimation(0, 1, 500);
 		}
 	}
 
@@ -275,7 +296,7 @@ void Game::drawLevel()
 
 
 
-	if (!(birdObj[currentBird]->m_birdBody->IsAwake()) && isBirdFlying == true) {
+	if (!(birdObj[currentBird]->m_birdBody->IsAwake()) && isBirdFlying == true ) {
 		bool hasEverythingStopped = false;
 		int currentbodycount = 0;
 		for (b2Body* b = physics->world->GetBodyList(); b; b = b->GetNext())
@@ -290,13 +311,14 @@ void Game::drawLevel()
 		}
 
 
-		if (currentBird < maxBirds) {
+		if (currentBird < maxBirds && pigsKilled <= maxPigs) {
 
 			if (hasEverythingStopped == true) {
-				birdObj[currentBird]->m_birdBody->SetUserData(&pigDead);
+				birdObj[currentBird]->m_birdBody->SetUserData(&userDataDead);
 				worldbodycount--;
 				currentBird++;
 				isBirdFlying = false;
+				restrictUserInput = false;
 				hasEverythingStopped = false;
 			}
 
@@ -304,15 +326,17 @@ void Game::drawLevel()
 		else {
 			if (isGameOver == false) {
 				isGameOver = true;
+				restrictUserInput = false;
 
 				//std::cout << "Game Over! \nScore: " << score << std::endl;
 				gameOver = new Sprite(csdl_setup->GetRenderer(), "gameOver.png", 550, 150, 400, 400);
 				replayButton = new Sprite(csdl_setup->GetRenderer(), "replayButton.png", 600, 500, 300, 100);
-				ttfScore = new Sprite(csdl_setup->GetRenderer(), std::to_string(score), ScreenWidth / 2, ScreenHeight / 2);
+				//ttfScore = new Sprite(csdl_setup->GetRenderer(), std::to_string(score), ScreenWidth / 2, ScreenHeight / 2);
 			}
 			gameOver->Draw();
 			replayButton->Draw();
-			ttfScore->Draw();
+			DrawScore();
+			//ttfScore->Draw();
 
 			//while (isGameOver=true)
 			//{
@@ -384,12 +408,17 @@ void Game::resetLevel()
 	isButtonDown = false;
 	isBirdFlying = false;
 	loadNextBird = false;
+	isScoreStored = false;
+
 	currentBird = 0;
 	score = 0;
 	worldbodycount = 0;
+	pigsKilled = 0;
+
 	pigObj.clear();
 	birdObj.clear();
 	pigWallObj.clear();
+	scoreDigits.clear();
 
 	currentLvl++;
 	isNextLevel = true;
@@ -403,8 +432,8 @@ void Game::loadNextLevel()
 	ground = new Sprite(csdl_setup->GetRenderer(), "ground.png", 0, ScreenHeight - 200, ScreenWidth, 1);
 	slingshotA = new Sprite(csdl_setup->GetRenderer(), "images/SlingA.png", 470, 490, 43, 125);
 	slingshotB = new Sprite(csdl_setup->GetRenderer(), "images/SlingB.png", 500, 500, 38, 198);
-	rubberA = new Sprite(csdl_setup->GetRenderer(), "sling.png", 0, 0, 100, 5);
-	rubberB = new Sprite(csdl_setup->GetRenderer(), "sling.png", 0, 0, 100, 5);
+	rubberA = new Sprite(csdl_setup->GetRenderer(), "images/sling.png", 0, 0, 100, 5);
+	rubberB = new Sprite(csdl_setup->GetRenderer(), "images/sling.png", 0, 0, 100, 5);
 
 
 	physics = new BoxPhysics();
@@ -412,24 +441,7 @@ void Game::loadNextLevel()
 	loadFromFile();
 
 	maxBirds = birdObj.size() - 1;
-
-	/*for (int i = 0; i <= maxBirds; i++)
-	{
-		birdObj.push_back(new Birds(*physics->world, csdl_setup, 400, 400));
-	}*/
-
-	//physics->createRopeJoint(birdObj[0]->m_birdBody, physics->slingshotBody);
-
-	/*for (int i = 0; i < 3; i++)
-	{
-		pigObj.push_back(new Pigs(*physics->world, csdl_setup, 950 + i * 50, 600));
-	}*/
-
-	/*pigWallObj.push_back(new PigWalls(*physics->world, csdl_setup, 900, 600, 10, 70));
-	pigWallObj.push_back(new PigWalls(*physics->world, csdl_setup, 1000, 600, 10, 70));
-	pigWallObj.push_back(new PigWalls(*physics->world, csdl_setup, 950, 520, 100, 10));
-	pigWallObj.push_back(new PigWalls(*physics->world, csdl_setup, 900, 460, 10, 70));
-	pigWallObj.push_back(new PigWalls(*physics->world, csdl_setup, 1000, 460, 10, 70));*/
+	maxPigs = pigObj.size() - 1;
 }
 
 void Game::loadFromFile()
@@ -557,8 +569,6 @@ void Game::loadFromFile()
 	std::cout << worldbodycount << std::endl;
 }
 
-
-
 void Game::drawSlingshot(b2Body * birdBody, b2Body * slingbody, Sprite * rubberband)
 {
 	b2Vec2 birdPos = birdBody->GetWorldCenter();
@@ -595,3 +605,24 @@ void Game::drawMenu()
 	exitButton->Draw();
 
 }
+
+void Game::getScoreVector() {
+	while (score > 0 && isScoreStored == false) {
+		scoreDigits.push_back(score % 10);
+		score /= 10;
+	}
+	std::reverse(scoreDigits.begin(), scoreDigits.end());
+}
+
+void Game::DrawScore() {
+
+	if (isScoreStored == false) {
+		getScoreVector();
+		isScoreStored = true;
+	}
+	for (int i = 0; i < scoreDigits.size(); i++)
+	{
+		scoreVector[scoreDigits[i]]->Draw(10 + i * 40 , 0);
+	}
+}
+
