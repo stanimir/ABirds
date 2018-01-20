@@ -35,6 +35,7 @@ private:
 	bool isGameOver = false;
 	bool restrictUserInput = false;
 	bool isScoreStored = false;
+	bool startGame = false;
 
 	int worldbodycount = 0;
 	int currentLvl = 0;

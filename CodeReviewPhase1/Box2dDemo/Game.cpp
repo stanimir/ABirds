@@ -58,14 +58,12 @@ void Game::GameLoop()
 						gameState = GameState::EndGame;
 					}
 					/*if ((x > 1220 & x < 1380) & (y > 718 & y < 836)) {
-						std::cout << "You`ve clicked on the main Options..." << std::endl;
+					std::cout << "You`ve clicked on the main Options..." << std::endl;
 					}*/
 					if ((x > playButton->rect.x && x < playButton->rect.x + playButton->rect.w) && (y > playButton->rect.y & y < playButton->rect.y + playButton->rect.h))
 					{
-						gameState = GameState::Level1;
-						loadNextLevel();
-						isNextLevel = false;
-						isButtonDown = false;
+						startGame = true;
+
 					}
 				}
 
@@ -75,6 +73,13 @@ void Game::GameLoop()
 			case SDL_MOUSEBUTTONUP: {
 				if (isButtonDown == true) {
 					isButtonDown = false;
+					if (startGame == true) {
+						gameState = GameState::Level1;
+						loadNextLevel();
+						isNextLevel = false;
+						isButtonDown = false;
+						startGame = false;
+					}
 				}
 			}
 			default:
