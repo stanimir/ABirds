@@ -16,7 +16,17 @@ public:
 	Sprite* m_birdSprite;
 	Sprite* m_birdSpriteAnimation;
 
+	
+	int m_beginFrame;
+	int m_endFrame;
+	int m_speed;
+
 private: 
+	std::string filename;
+	int m_framesX;
+	int m_framesY;
+
 	void createBird(b2World& world, int xpos, int ypos);
+	void readAnimationData();
 };
 

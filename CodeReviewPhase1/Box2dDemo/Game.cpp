@@ -235,7 +235,7 @@ void Game::drawLevel()
 		}
 		if (birdObj[i]->m_birdBody->IsActive()) {
 			drawWithPhysicsAndAnim(birdObj[i]->m_birdBody, birdObj[i]->m_birdSpriteAnimation, 0, 0);
-			birdObj[i]->m_birdSpriteAnimation->PlayAnimation(0, 1, 500);
+			birdObj[i]->m_birdSpriteAnimation->PlayAnimation(birdObj[i]->m_beginFrame, birdObj[i] ->m_endFrame, birdObj[i] ->m_speed);
 		}
 	}
 
@@ -259,7 +259,7 @@ void Game::drawLevel()
 		if (!pigObj[i]->m_pigBody->IsActive() && pigScoreStart_tick > SDL_GetTicks() && (*(int*)pigObj[i]->m_pigBody->GetUserData() == userDataPigDying)) {
 			piggyShot->Draw(pigtemp);
 			drawWithPhysicsAndAnim(pigObj[i]->m_pigBody, pigObj[i]->m_pigDeathAnimation, 0, 0);
-			pigObj[i]->m_pigDeathAnimation->PlayAnimation(0, 2, 250);
+			pigObj[i]->m_pigDeathAnimation->PlayAnimation(pigObj[i]->m_beginFrame[1], pigObj[i]->m_endFrame[1], pigObj[i]->m_speed[1]);
 		}
 
 		if (!pigObj[i]->m_pigBody->IsActive() && pigScoreStart_tick < SDL_GetTicks() && (*(int*)pigObj[i]->m_pigBody->GetUserData() == userDataPigDying)) {
@@ -269,7 +269,7 @@ void Game::drawLevel()
 
 		if (pigObj[i]->m_pigBody->IsActive()) {
 			drawWithPhysicsAndAnim(pigObj[i]->m_pigBody, pigObj[i]->m_pigIdleAnimation, 0, 0);
-			pigObj[i]->m_pigIdleAnimation->PlayAnimation(0, 1, 500);
+			pigObj[i]->m_pigIdleAnimation->PlayAnimation(pigObj[i]->m_beginFrame[0], pigObj[i]->m_endFrame[0], pigObj[i]->m_speed[0]);
 		}
 	}
 
