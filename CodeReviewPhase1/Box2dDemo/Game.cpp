@@ -82,6 +82,7 @@ void Game::GameLoop()
 						isNextLevel = false;
 						isButtonDown = false;
 						startGame = false;
+						startWaitForLoadLevel = SDL_GetTicks() + 500;
 					}
 				}
 			}
@@ -104,65 +105,65 @@ void Game::GameLoop()
 				birdObj[currentBird]->m_birdBody->SetTransform(b2Vec2(4.8f, 5.0f), birdObj[currentBird]->m_birdBody->GetAngle());
 			}
 
-
-			switch (csdl_setup->GetMainEvent()->type)
-			{
-			case SDL_MOUSEBUTTONDOWN:
-			{
-				if (isButtonDown == false) {
-					isButtonDown = true;
-					Mix_PlayChannel(-1, csdl_setup->rubberband, 0);
-				}
-
-				break;
-			}
-			case SDL_MOUSEMOTION:
-			{
-				if (csdl_setup->GetMainEvent()->motion.state & SDL_BUTTON_LMASK & isButtonDown) {
-					int x = csdl_setup->GetMainEvent()->button.x;
-					int y = csdl_setup->GetMainEvent()->button.y;
-					if (x < 350) x = 350;
-					if (x > 500) x = 500;
-					if (y > 650) y = 650;
-					if (y < 400) y = 400;
-					b2Vec2 temp = b2Vec2(((x - 25)*P2M), ((y - 25)*P2M));
-					birdObj[currentBird]->m_birdBody->SetTransform(temp, birdObj[currentBird]->m_birdBody->GetAngle());
-					birdObj[currentBird]->m_birdBody->SetLinearVelocity(b2Vec2(0, 0));
-				}
-				break;
-			}
-
-			case SDL_MOUSEBUTTONUP:
-			{
-
-				if (isButtonDown == true) {
-					isButtonDown = false;
-					
-					if (physics->ropeJoint != NULL) {
-						physics->world->DestroyJoint(physics->ropeJoint);
-						physics->ropeJoint = NULL;
+			if (SDL_GetTicks() > startWaitForLoadLevel) {
+				switch (csdl_setup->GetMainEvent()->type)
+				{
+				case SDL_MOUSEBUTTONDOWN:
+				{
+					if (isButtonDown == false) {
+						isButtonDown = true;
+						Mix_PlayChannel(-1, csdl_setup->rubberband, 0);
 					}
-					b2Vec2 birdLastPos = birdObj[currentBird]->m_birdBody->GetPosition();
-					b2Vec2 wallPos = physics->slingshotBody->GetPosition();
-					b2Vec2 forceToApply = b2Vec2(((physics->slingshotBody->GetPosition().x - birdLastPos.x) * P2M), ((physics->slingshotBody->GetPosition().y - birdLastPos.y)*P2M));
-					forceToApply.x *= 150;
-					forceToApply.y *= 150;
-					std::cout << "Xforce: " << forceToApply.x << " Yforce: " << forceToApply.y << std::endl;
 
-					birdObj[currentBird]->m_birdBody->ApplyLinearImpulse(forceToApply, birdObj[currentBird]->m_birdBody->GetWorldCenter(), true);
-
-					Mix_PlayChannel(-1, csdl_setup->birdflying, 0);
-
-					isBirdFlying = true;
-					restrictUserInput = true;
+					break;
 				}
-				break;
-			}
+				case SDL_MOUSEMOTION:
+				{
+					if (csdl_setup->GetMainEvent()->motion.state & SDL_BUTTON_LMASK & isButtonDown) {
+						int x = csdl_setup->GetMainEvent()->button.x;
+						int y = csdl_setup->GetMainEvent()->button.y;
+						if (x < 350) x = 350;
+						if (x > 500) x = 500;
+						if (y > 650) y = 650;
+						if (y < 400) y = 400;
+						b2Vec2 temp = b2Vec2(((x - 25)*P2M), ((y - 25)*P2M));
+						birdObj[currentBird]->m_birdBody->SetTransform(temp, birdObj[currentBird]->m_birdBody->GetAngle());
+						birdObj[currentBird]->m_birdBody->SetLinearVelocity(b2Vec2(0, 0));
+					}
+					break;
+				}
 
-			default:
-				break;
-			}
+				case SDL_MOUSEBUTTONUP:
+				{
 
+					if (isButtonDown == true) {
+						isButtonDown = false;
+
+						if (physics->ropeJoint != NULL) {
+							physics->world->DestroyJoint(physics->ropeJoint);
+							physics->ropeJoint = NULL;
+						}
+						b2Vec2 birdLastPos = birdObj[currentBird]->m_birdBody->GetPosition();
+						b2Vec2 wallPos = physics->slingshotBody->GetPosition();
+						b2Vec2 forceToApply = b2Vec2(((physics->slingshotBody->GetPosition().x - birdLastPos.x) * P2M), ((physics->slingshotBody->GetPosition().y - birdLastPos.y)*P2M));
+						forceToApply.x *= 150;
+						forceToApply.y *= 150;
+						std::cout << "Xforce: " << forceToApply.x << " Yforce: " << forceToApply.y << std::endl;
+
+						birdObj[currentBird]->m_birdBody->ApplyLinearImpulse(forceToApply, birdObj[currentBird]->m_birdBody->GetWorldCenter(), true);
+
+						Mix_PlayChannel(-1, csdl_setup->birdflying, 0);
+
+						isBirdFlying = true;
+						restrictUserInput = true;
+					}
+					break;
+				}
+
+				default:
+					break;
+				}
+			}
 		}
 
 
@@ -387,6 +388,7 @@ void Game::resetLevel()
 
 	currentLvl++;
 	isNextLevel = true;
+	startWaitForLoadLevel = SDL_GetTicks() + 1000;
 }
 
 void Game::loadNextLevel()

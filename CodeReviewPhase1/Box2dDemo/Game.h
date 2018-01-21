@@ -26,6 +26,7 @@ private:
 	int ScreenHeight;
 	Uint32 starting_tick;
 	Uint32 pigScoreStart_tick;
+	Uint32 startWaitForLoadLevel;
 	bool quit;
 	bool isButtonDown = false;
 	bool isBirdFlying = false;
