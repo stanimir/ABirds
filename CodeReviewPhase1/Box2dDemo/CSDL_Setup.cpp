@@ -12,12 +12,16 @@ CSDL_Setup::CSDL_Setup(bool* quit, int ScreenWidth, int ScreenHeight)
 		std::cout << "Error: " << Mix_GetError() << std::endl;
 	}
 
-	Mix_Volume(-1, 20);
-	Mix_VolumeMusic(20);
+	Mix_Volume(-1, 60);
+	Mix_VolumeMusic(50);
 	bgm = Mix_LoadMUS("sfx/theme.ogg");
 	rubberband = Mix_LoadWAV("sfx/slingshotstr.wav");
 	pigcollide = Mix_LoadWAV("sfx/pigcollision.wav");
 	birdflying = Mix_LoadWAV("sfx/birdfly.wav");
+	levelfailed = Mix_LoadWAV("sfx/levelfailed.wav");
+	levelstart = Mix_LoadWAV("sfx/levelstart.wav");
+	levelvictory = Mix_LoadWAV("sfx/levelvictory.wav");
+	levelcomplete = Mix_LoadWAV("sfx/levelcompleted.wav");
 
 	window = NULL;
 	window = SDL_CreateWindow("ABirds", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, ScreenWidth, ScreenHeight, SDL_WINDOW_SHOWN);
@@ -40,6 +44,9 @@ CSDL_Setup::~CSDL_Setup(void)
 	Mix_FreeChunk(rubberband);
 	Mix_FreeChunk(pigcollide);
 	Mix_FreeChunk(birdflying);
+	Mix_FreeChunk(levelfailed);
+	Mix_FreeChunk(levelstart);
+	Mix_FreeChunk(levelcomplete);
 	Mix_FreeMusic(bgm);
 
 	Mix_Quit();

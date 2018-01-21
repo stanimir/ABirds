@@ -19,6 +19,7 @@ private:
 		MainMenu,
 		Level1,
 		Level2,
+		Level3,
 		EndGame
 	};
 
@@ -59,6 +60,7 @@ private:
 	void drawLeftSlingshot(b2Body* birdBody, Sprite* leftSprite, Sprite* rubberband);
 	void drawMenu();
 	void resetLevel();
+	void prepForNextLevel();
 	void loadNextLevel();
 	void drawLevel();
 	void loadFromFile();
@@ -70,6 +72,8 @@ private:
 	Sprite* background;
 	Sprite* exitButton;
 	Sprite* playButton;
+	Sprite* replayButton;
+	Sprite* nextLevelButton;
 	Sprite* ground;
 	Sprite* slingshotA;
 	Sprite* slingshotB;
@@ -78,7 +82,6 @@ private:
 	Sprite* gameOver;
 	Sprite* piggyShot;
 	CSDL_Setup* csdl_setup;
-	Sprite* replayButton;
 
 	BoxPhysics* physics;
 

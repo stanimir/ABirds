@@ -18,7 +18,7 @@ Game::Game(int passed_ScreenWidth, int passed_ScreenHeight)
 
 	for (int i = 0; i < 10; i++)
 	{
-		scoreVector.push_back(new Sprite(csdl_setup->GetRenderer(), "images/ScoreSeparate/score" + std::to_string(i) + ".png", 0, 0, 40, 60));
+		scoreVector.push_back(new Sprite(csdl_setup->GetRenderer(), "images/ScoreSeparate/score" + std::to_string(i) + ".png", 0, 0, 50, 70));
 	}
 
 	gameState = GameState::MainMenu;
@@ -52,7 +52,7 @@ void Game::GameLoop()
 		if (gameState == MainMenu || isGameOver == true) {
 
 			switch (csdl_setup->GetMainEvent()->type)
-			{			
+			{
 			case SDL_MOUSEBUTTONDOWN:
 			{
 				if (isButtonDown == false) {
@@ -177,6 +177,7 @@ void Game::GameLoop()
 			break;
 
 		case Level1:
+			Mix_HaltMusic();
 			drawLevel();
 			if (isNextLevel == true) {
 				gameState = GameState::Level2;
@@ -186,10 +187,19 @@ void Game::GameLoop()
 		case Level2:
 			drawLevel();
 			if (isNextLevel == true) {
+				gameState = GameState::Level3;
+			}
+			break;
+
+		case Level3:
+		{
+			drawLevel();
+			if (isNextLevel == true) {
 				gameState = GameState::EndGame;
 			}
 			break;
 
+		}
 		case EndGame:
 			std::cout << "End Of State Machine!" << std::endl;
 			quit = true;
@@ -223,7 +233,7 @@ void Game::drawLevel()
 		if (*(int*)birdObj[i]->m_birdBody->GetUserData() == userDataDead) {
 			birdObj[i]->m_birdBody->SetActive(false);
 		}
-		if (birdObj[i]->m_birdBody->IsActive()) {			
+		if (birdObj[i]->m_birdBody->IsActive()) {
 			drawWithPhysicsAndAnim(birdObj[i]->m_birdBody, birdObj[i]->m_birdSpriteAnimation, 0, 0);
 			birdObj[i]->m_birdSpriteAnimation->PlayAnimation(0, 1, 500);
 		}
@@ -233,14 +243,14 @@ void Game::drawLevel()
 
 	for (int i = 0; i < pigObj.size(); i++)
 	{
-		
+
 		if (pigObj[i]->m_pigBody->IsActive() && (*(int*)pigObj[i]->m_pigBody->GetUserData() == userDataPigDying)) {
 			pigtemp = b2Vec2((pigObj[i]->m_pigBody->GetPosition().x) - 1.8f, (pigObj[i]->m_pigBody->GetPosition().y) - 1.6f);
 			pigObj[i]->m_pigBody->SetActive(false);
 			std::cout << "Inside PigSetActive(false)" << std::endl;
 			worldbodycount--;
 			pigsKilled++;
-			
+
 			Mix_PlayChannel(-1, csdl_setup->pigcollide, 0);
 			score += 5000;
 			pigScoreStart_tick = SDL_GetTicks() + 750;
@@ -271,7 +281,7 @@ void Game::drawLevel()
 
 
 
-	if (!(birdObj[currentBird]->m_birdBody->IsAwake()) && isBirdFlying == true ) {
+	if (!(birdObj[currentBird]->m_birdBody->IsAwake()) && isBirdFlying == true) {
 		bool hasEverythingStopped = false;
 		int currentbodycount = 0;
 		for (b2Body* b = physics->world->GetBodyList(); b; b = b->GetNext())
@@ -286,7 +296,7 @@ void Game::drawLevel()
 		}
 
 
-		if (currentBird < maxBirds && pigsKilled <= maxPigs) {
+		if (currentBird < maxBirds && pigsKilled < maxPigs) {
 
 			if (hasEverythingStopped == true) {
 				birdObj[currentBird]->m_birdBody->SetUserData(&userDataDead);
@@ -302,15 +312,28 @@ void Game::drawLevel()
 			if (isGameOver == false) {
 				isGameOver = true;
 				restrictUserInput = false;
+				if (currentBird <= maxBirds && pigsKilled >= maxPigs) {
+					Mix_PlayChannel(-1, csdl_setup->levelvictory, 0);
+					SDL_Delay(2000);
+				}
+				else {
+					Mix_PlayChannel(-1, csdl_setup->levelfailed, 0);
+					SDL_Delay(2000);
+				}
+				Mix_PlayChannel(-1, csdl_setup->levelcomplete, 0);
 
-				gameOver = new Sprite(csdl_setup->GetRenderer(), "images/gameOver.png", 550, 150, 400, 400);
-				replayButton = new Sprite(csdl_setup->GetRenderer(), "images/replayButton.png", 600, 500, 300, 100);
-				
+				gameOver = new Sprite(csdl_setup->GetRenderer(), "images/ScoreSeparate/levelcomplete.png", 465, 150, 670, 200);
+				replayButton = new Sprite(csdl_setup->GetRenderer(), "images/MainMenu/replayButton.png", 465, 500, 160, 120);
+				nextLevelButton = new Sprite(csdl_setup->GetRenderer(), "images/MainMenu/PlayButton.png", 975, 500, 160, 120);
+
 			}
+
+
 			gameOver->Draw();
 			replayButton->Draw();
+			nextLevelButton->Draw();
 			DrawScore();
-			
+
 			switch (csdl_setup->GetMainEvent()->type)
 			{
 			case SDL_MOUSEBUTTONUP:
@@ -322,9 +345,13 @@ void Game::drawLevel()
 					int y = csdl_setup->GetMainEvent()->button.y;
 					std::cout << "X: " << x;
 					std::cout << " Y: " << y << std::endl;
-					if ((x > 600 && x < 1100) && (y > 500 && y < 600))
+					if ((x > replayButton->rect.x && x < replayButton->rect.x + replayButton->rect.w) && (y > replayButton->rect.y && y < replayButton->rect.y + replayButton->rect.h))
 					{
 						resetLevel();
+						isGameOver = false;
+					}
+					if ((x > nextLevelButton->rect.x && x < nextLevelButton->rect.x + nextLevelButton->rect.w) && (y > nextLevelButton->rect.y && y < nextLevelButton->rect.y + nextLevelButton->rect.h)) {
+						prepForNextLevel();
 						isGameOver = false;
 					}
 				}
@@ -386,6 +413,26 @@ void Game::resetLevel()
 	pigWallObj.clear();
 	scoreDigits.clear();
 
+	loadNextLevel();
+	startWaitForLoadLevel = SDL_GetTicks() + 1000;
+}
+
+void Game::prepForNextLevel() {
+	isButtonDown = false;
+	isBirdFlying = false;
+	loadNextBird = false;
+	isScoreStored = false;
+
+	currentBird = 0;
+	score = 0;
+	worldbodycount = 0;
+	pigsKilled = 0;
+
+	pigObj.clear();
+	birdObj.clear();
+	pigWallObj.clear();
+	scoreDigits.clear();
+
 	currentLvl++;
 	isNextLevel = true;
 	startWaitForLoadLevel = SDL_GetTicks() + 1000;
@@ -393,7 +440,7 @@ void Game::resetLevel()
 
 void Game::loadNextLevel()
 {
-
+	Mix_PlayChannel(-1, csdl_setup->levelstart, 0);
 	background = new Sprite(csdl_setup->GetRenderer(), "images/level" + std::to_string(currentLvl) + "bgn.png", 0, 0, ScreenWidth, ScreenHeight);
 
 	ground = new Sprite(csdl_setup->GetRenderer(), "images/ground.png", 0, ScreenHeight - 200, ScreenWidth, 1);
@@ -408,7 +455,7 @@ void Game::loadNextLevel()
 	loadFromFile();
 
 	maxBirds = birdObj.size() - 1;
-	maxPigs = pigObj.size() - 1;
+	maxPigs = pigObj.size();
 }
 
 void Game::loadFromFile()
@@ -564,7 +611,7 @@ void Game::drawMenu()
 	if (isMenuImageLoaded == false) {
 		isMenuImageLoaded = true;
 		background = new Sprite(csdl_setup->GetRenderer(), "images/MainMenu/MainMenuButtonless.png", 0, 0, ScreenWidth, ScreenHeight);
-		playButton = new Sprite(csdl_setup->GetRenderer(), "images/MainMenu/PlayButton.png", 1200, 600, 160, 120);
+		playButton = new Sprite(csdl_setup->GetRenderer(), "images/MainMenu/PlayButton.png", 1240, 700, 160, 120);
 		exitButton = new Sprite(csdl_setup->GetRenderer(), "images/MainMenu/ExitButton.png", 200, 700, 160, 120);
 	}
 	background->Draw();
@@ -574,9 +621,14 @@ void Game::drawMenu()
 }
 
 void Game::getScoreVector() {
-	while (score > 0 && isScoreStored == false) {
-		scoreDigits.push_back(score % 10);
-		score /= 10;
+	if (score == 0 && isScoreStored == false) {
+		scoreDigits.push_back(0);
+	}
+	else {
+		while (score > 0 && isScoreStored == false) {
+			scoreDigits.push_back(score % 10);
+			score /= 10;
+		}
 	}
 	std::reverse(scoreDigits.begin(), scoreDigits.end());
 }
@@ -589,7 +641,7 @@ void Game::DrawScore() {
 	}
 	for (int i = 0; i < scoreDigits.size(); i++)
 	{
-		scoreVector[scoreDigits[i]]->Draw(10 + i * 40 , 0);
+		scoreVector[scoreDigits[i]]->Draw(775 + i * 50, 275);
 	}
 }
 

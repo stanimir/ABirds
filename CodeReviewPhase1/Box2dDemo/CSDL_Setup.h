@@ -15,7 +15,10 @@ public:
 	Mix_Chunk* rubberband;
 	Mix_Chunk* pigcollide;
 	Mix_Chunk* birdflying;
-
+	Mix_Chunk* levelstart;
+	Mix_Chunk* levelfailed;
+	Mix_Chunk* levelvictory;
+	Mix_Chunk* levelcomplete;
 
 
 	void Begin();
