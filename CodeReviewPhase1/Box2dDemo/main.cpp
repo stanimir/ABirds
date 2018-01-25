@@ -1,7 +1,4 @@
-#include "Box2D\Box2D.h"
 #include "Game.h"
-#include "BoxPhysics.h"
-
 #include <iostream>
 
 int main(int argc, const char * argv[])
